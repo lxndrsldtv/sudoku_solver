@@ -124,3 +124,10 @@ class SudokuCellRepositioning extends SudokuState {
 
   final SudokuState previousState;
 }
+
+class SudokuSolvingInProgress extends SudokuState {
+  SudokuSolvingInProgress({required this.previousState})
+      : super.fromState(state: previousState);
+
+  final SudokuState previousState;
+}

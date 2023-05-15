@@ -165,6 +165,8 @@ class SudokuBloc extends Bloc<SudokuEvent, SudokuState> {
     SudokuCalculatePressed event,
     Emitter<SudokuState> emit,
   ) async {
+    emit(SudokuSolvingInProgress(previousState: state));
+
     await _fillSingletonCells(emit);
 
     var solvedSudoku = state.sudoku;
@@ -172,7 +174,13 @@ class SudokuBloc extends Bloc<SudokuEvent, SudokuState> {
 
     var sudokuContainsEmptyCells =
         solvedSudoku.cells.firstWhereOrNull((c) => c.value == 0) != null;
+
     while (sudokuContainsEmptyCells) {
+
+      var stillInCalculatingState =
+          state is SudokuSolvingInProgress || state is SudokuCellReplaced;
+      if (!stillInCalculatingState) break;
+
       var index = processedCells.isNotEmpty ? processedCells.first + 1 : 0;
 
       final allCellsAreProcessed = index > solvedSudoku.cells.length;
