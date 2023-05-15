@@ -1,14 +1,9 @@
 import 'dart:io';
-import 'dart:math';
-import 'package:flutter/cupertino.dart';
 import 'package:logging/logging.dart';
 import 'package:flutter/services.dart';
-import 'package:collection/collection.dart';
 import 'package:image/image.dart' as image_tools;
 import 'package:path_provider/path_provider.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
-
-import '../models/sudoku_cell_model.dart';
 
 class SudokuUtilsService {
   static final logger = Logger('SudokuUtilsService');

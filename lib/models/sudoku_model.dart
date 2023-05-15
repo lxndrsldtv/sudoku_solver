@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 import 'package:cross_file/cross_file.dart';
@@ -9,7 +8,6 @@ import 'sudoku_cell_model.dart';
 class SudokuModel {
   final SudokuSize size;
   final List<SudokuCellModel> cells;
-  // final Uint8List? image;
   final XFile? imageFile;
 
   SudokuModel(
@@ -25,7 +23,7 @@ class SudokuModel {
     return SudokuModel(
         size: size ?? this.size,
         cells: cells ?? this.cells,
-        imageFile: image ?? this.imageFile);
+        imageFile: image ?? imageFile);
   }
 
   bool isSolved() {

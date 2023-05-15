@@ -49,6 +49,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: any
+  cross_file: latest
 
 dev_dependencies:
   flutter_test:

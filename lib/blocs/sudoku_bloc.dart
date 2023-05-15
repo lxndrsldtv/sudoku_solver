@@ -1,5 +1,4 @@
 import 'dart:collection';
-// import 'dart:typed_data';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
@@ -9,18 +8,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:logging/logging.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path_provider/path_provider.dart';
-// import 'package:sudoku_solver/models/app_settings_model.dart';
 import 'package:sudoku_solver/services/sudoku_solver_service.dart';
-
-// import '../models/sudoku_model.dart';
-// import '../models/sudoku_cell_model.dart';
 
 import '../services/sudoku_utils_service.dart';
 import './sudoku_events.dart';
 import './sudoku_states.dart';
 
 class SudokuBloc extends Bloc<SudokuEvent, SudokuState> {
-  // final SudokuModel sudoku;
   final logger = Logger('SudokuBloc');
 
   SudokuBloc() : super(SudokuInitial()) {
