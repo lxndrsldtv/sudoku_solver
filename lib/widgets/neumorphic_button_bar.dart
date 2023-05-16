@@ -4,6 +4,8 @@ import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 
 import '../blocs/sudoku_bloc.dart';
 import '../blocs/sudoku_events.dart';
+import '../blocs/presentation/presentation_bloc.dart';
+import '../blocs/presentation/presentation_events.dart';
 
 class NeumorphicButtonBar extends StatelessWidget {
   NeumorphicButtonBar({
@@ -27,14 +29,14 @@ class NeumorphicButtonBar extends StatelessWidget {
               style: buttonStyle,
               child: Center(child: NeumorphicText(label, style: textStyle)))));
 
-  List<Widget> buttons(BuildContext context, SudokuBloc bloc) => [
-        buildButton(AppLocalizations.of(context)!.btnLabelImage, () => bloc.add(SudokuSelectImagePressed())),
+  List<Widget> buttons(BuildContext context, SudokuBloc sudokuBloc, PresentationBloc presentationBloc) => [
+        buildButton(AppLocalizations.of(context)!.btnLabelImage, () => sudokuBloc.add(SudokuSelectImagePressed())),
         const SizedBox(width: 2.0, height: 8.0),
-        buildButton(AppLocalizations.of(context)!.btnLabelSolve, () => bloc.add(SudokuCalculatePressed())),
+        buildButton(AppLocalizations.of(context)!.btnLabelSolve, () => sudokuBloc.add(SudokuCalculatePressed())),
         const SizedBox(width: 2.0, height: 8.0),
-        buildButton(AppLocalizations.of(context)!.btnLabelRestart, () => bloc.add(SudokuStarted())),
+        buildButton(AppLocalizations.of(context)!.btnLabelRestart, () => sudokuBloc.add(SudokuStarted())),
         const SizedBox(width: 2.0, height: 8.0),
-        buildButton(AppLocalizations.of(context)!.btnLabelSettings, () => bloc.add(SudokuSettingsPressed())),
+        buildButton(AppLocalizations.of(context)!.btnLabelSettings, () => presentationBloc.add(SettingsButtonPressed())),
       ];
 
   @override
@@ -43,6 +45,7 @@ class NeumorphicButtonBar extends StatelessWidget {
     final screenSize = mediaQuery.size;
     final screenOrientation = mediaQuery.orientation;
     final sudokuBloc = BlocProvider.of<SudokuBloc>(context);
+    final presentationBloc = BlocProvider.of<PresentationBloc>(context);
 
     _buttonWidth = screenSize.width / 4;
     if (screenOrientation == Orientation.portrait) {
@@ -54,9 +57,9 @@ class NeumorphicButtonBar extends StatelessWidget {
     return screenOrientation == Orientation.portrait
         ? Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: buttons(context, sudokuBloc))
+            children: buttons(context, sudokuBloc, presentationBloc))
         : Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: buttons(context, sudokuBloc));
+            children: buttons(context, sudokuBloc, presentationBloc));
   }
 }

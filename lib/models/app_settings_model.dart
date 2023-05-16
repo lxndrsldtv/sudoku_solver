@@ -1,15 +1,20 @@
 class AppSettingsModel {
-  final gridSettings = SudokuGridSettingModel();
+  final gridSettings = SudokuGridSettingsModel();
   final cellSettings = SudokuCellSettingsModel();
+  final sudokuSettings = SudokuSettingsModel();
 }
 
 class SudokuCellSettingsModel {
   bool displayCellImage = true;
 }
 
-class SudokuGridSettingModel {
+class SudokuGridSettingsModel {
   double cellDividerSize = 1.0;
   double  subgridDividerSize = 8.0;
   // double cellDividerSize = 0.0;
   // double  subgridDividerSize = 0.0;
+}
+
+class SudokuSettingsModel {
+  int sudokuSize = 9; // default is sudoku of 9x9
 }

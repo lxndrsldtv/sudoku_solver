@@ -1,25 +1,27 @@
 import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
-import 'package:sudoku_solver/models/app_settings_model.dart';
+// import 'package:sudoku_solver/models/app_settings_model.dart';
 import 'package:sudoku_solver/models/sudoku_cell_model.dart';
 import 'package:sudoku_solver/models/sudoku_model.dart';
 
 // abstract
 class SudokuState {
-  SudokuState({required this.sudoku, required this.settings});
+  // SudokuState({required this.sudoku, required this.settings});
+  SudokuState({required this.sudoku});
 
   SudokuState.fromState({required SudokuState state})
-      : sudoku = state.sudoku,
-        settings = state.settings;
+      : sudoku = state.sudoku;
+        // settings = state.settings;
 
   final SudokuModel sudoku;
-  final AppSettingsModel settings;
+  // final AppSettingsModel settings;
 }
 
 class SudokuInitial extends SudokuState {
   SudokuInitial()
-      : super(sudoku: SudokuModel.empty(), settings: AppSettingsModel());
+      : super(sudoku: SudokuModel.empty());
+      // : super(sudoku: SudokuModel.empty(), settings: AppSettingsModel());
 // final SudokuModel sudoku;
 }
 
@@ -62,7 +64,7 @@ class SudokuCellReplaced extends SudokuState {
     return SudokuCellReplaced(
       state: SudokuState(
         sudoku: newSudoku,
-        settings: state.settings,
+        // settings: state.settings,
       ),
       changedCell: cell,
     );
@@ -93,7 +95,7 @@ class SudokuCellValuesRecognitionInProgress extends SudokuState {
       {required SudokuState state})
       : super.fromState(state: state);
 
-  // List<Uint8List> cellImages;
+// List<Uint8List> cellImages;
 }
 
 class SudokuCellValuesRecognitionFinished extends SudokuState {
@@ -104,19 +106,19 @@ class SudokuCellValuesRecognitionFinished extends SudokuState {
   List<Uint8List> cellImages;
 }
 
-class SudokuSettingsOpened extends SudokuState {
-  SudokuSettingsOpened({required this.previousState})
-      : super.fromState(state: previousState);
+// class SudokuSettingsOpened extends SudokuState {
+//   SudokuSettingsOpened({required this.previousState})
+//       : super.fromState(state: previousState);
+//
+//   final SudokuState previousState;
+// }
 
-  final SudokuState previousState;
-}
-
-class SudokuSettingsChngd extends SudokuState {
-  SudokuSettingsChngd({required this.previousState})
-      : super.fromState(state: previousState);
-
-  final SudokuState previousState;
-}
+// class SudokuSettingsChngd extends SudokuState {
+//   SudokuSettingsChngd({required this.previousState})
+//       : super.fromState(state: previousState);
+//
+//   final SudokuState previousState;
+// }
 
 class SudokuCellRepositioning extends SudokuState {
   SudokuCellRepositioning({required this.previousState})
@@ -127,6 +129,13 @@ class SudokuCellRepositioning extends SudokuState {
 
 class SudokuSolvingInProgress extends SudokuState {
   SudokuSolvingInProgress({required this.previousState})
+      : super.fromState(state: previousState);
+
+  final SudokuState previousState;
+}
+
+class SudokuSolvingInProgressSettingsOpened extends SudokuState {
+  SudokuSolvingInProgressSettingsOpened({required this.previousState})
       : super.fromState(state: previousState);
 
   final SudokuState previousState;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
+import 'package:sudoku_solver/blocs/settings/settings_bloc.dart';
 import 'package:sudoku_solver/widgets/set_cell_value_dialog.dart';
 
 import '../blocs/sudoku_bloc.dart';
@@ -22,8 +23,11 @@ class SudokuCellWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bloc = BlocProvider.of<SudokuBloc>(context);
-    logger.info('state: ${bloc.state}');
+    final sudokuBloc = BlocProvider.of<SudokuBloc>(context);
+    logger.info('state: ${sudokuBloc.state}');
+
+    final settingsBloc = BlocProvider.of<SettingsBloc>(context);
+    logger.info('state: ${sudokuBloc.state}');
 
     return BlocBuilder<SudokuBloc, SudokuState>(
       buildWhen: (prevState, currState) {
@@ -67,7 +71,7 @@ class SudokuCellWidget extends StatelessWidget {
                           Container(
                               alignment: Alignment.topLeft,
                               child: null != cell.image &&
-                                      bloc.state.settings.cellSettings
+                                      settingsBloc.state.settings.cellSettings
                                           .displayCellImage
                                   ? SizedBox(
                                       width: cellSize / 3, // 12.0,
@@ -88,7 +92,7 @@ class SudokuCellWidget extends StatelessWidget {
                           SetCellValueDialog(cellModel: cell));
                   logger.info('Dialog result = $res');
                   res != null
-                      ? bloc.add(SudokuCellValueSelected(
+                      ? sudokuBloc.add(SudokuCellValueSelected(
                           index: cell.index, value: res))
                       : {};
                 }));

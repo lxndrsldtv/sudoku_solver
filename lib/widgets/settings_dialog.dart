@@ -1,10 +1,13 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:logging/logging.dart';
+import 'package:sudoku_solver/blocs/presentation/presentation_bloc.dart';
 
-import '../blocs/sudoku_bloc.dart';
-import '../blocs/sudoku_events.dart';
-import '../blocs/sudoku_states.dart';
+import '../blocs/presentation/presentation_events.dart';
+import '../blocs/settings/settings_bloc.dart';
+import '../blocs/settings/settings_events.dart';
+import '../blocs/settings/settings_states.dart';
+
 import './dialog_frame.dart';
 
 class SettingsDialog extends StatelessWidget {
@@ -21,9 +24,10 @@ class SettingsDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sudokuBloc = BlocProvider.of<SudokuBloc>(context);
+    final settingsBloc = BlocProvider.of<SettingsBloc>(context);
+    final presentationBloc = BlocProvider.of<PresentationBloc>(context);
 
-    return BlocBuilder<SudokuBloc, SudokuState>(builder: (context, state) {
+    return BlocBuilder<SettingsBloc, SettingsState>(builder: (context, state) {
       logger.info('BlocBuilder');
       return DialogFrame(
           titleText: 'Settings',
@@ -43,14 +47,14 @@ class SettingsDialog extends StatelessWidget {
                             unselectedIntensity: 1.0,
                             lightSource: LightSource.topLeft,
                             selectedColor: Colors.white),
-                        value: sudokuBloc
+                        value: settingsBloc
                             .state.settings.cellSettings.displayCellImage,
                         onChanged: (value) =>
-                            sudokuBloc.add(SudokuImageInCellSwitched()))
+                            settingsBloc.add(ShowImageInCellFlagValueToggled()))
                   ]))
             ])
           ],
-          onClose: () => sudokuBloc.add(SudokuSettingsPressed()));
+          onClose: () => presentationBloc.add(SettingsDialogCloseButtonPressed()));
     });
   }
 }

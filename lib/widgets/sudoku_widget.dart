@@ -6,6 +6,10 @@ import 'package:logging/logging.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:sudoku_solver/blocs/presentation/presentation_bloc.dart';
+import 'package:sudoku_solver/blocs/presentation/presentation_states.dart';
+import 'package:sudoku_solver/blocs/settings/settings_bloc.dart';
+import 'package:sudoku_solver/blocs/settings/settings_states.dart';
 import 'package:sudoku_solver/widgets/settings_dialog.dart';
 
 import '../blocs/sudoku_events.dart';
@@ -142,37 +146,37 @@ class SudokuWidget extends StatelessWidget {
               height: cellSideLength * bloc.state.sudoku.size.rows,
               child: Image.file(File(path))));
 
-  Widget buildSizedBoxChild(
-      SudokuBloc bloc, SudokuState state, double minScreenSideLength) {
+  Widget buildSizedBoxChild(SudokuBloc sudokuBloc, SettingsBloc settingsBloc,
+      SudokuState state, double minScreenSideLength) {
     if (state is SudokuImageSelectionSucceed) {
       Future.delayed(const Duration(seconds: 1),
-          () => bloc.add(SudokuImageProcessRequested()));
+          () => sudokuBloc.add(SudokuImageProcessRequested()));
 
       return Stack(alignment: Alignment.center, children: [
-        sudokuWidget(bloc.state.sudoku,
-            cellSideLength(minScreenSideLength, bloc), 0.0, 0.0),
-        imageWidget(bloc, 1.0, state.sudoku.imageFile!.path,
-            cellSideLength(minScreenSideLength, bloc)),
+        sudokuWidget(sudokuBloc.state.sudoku,
+            cellSideLength(minScreenSideLength, settingsBloc), 0.0, 0.0),
+        imageWidget(sudokuBloc, 1.0, state.sudoku.imageFile!.path,
+            cellSideLength(minScreenSideLength, settingsBloc)),
       ]);
     }
 
     if (state is SudokuImageDividingSucceed) {
       return Stack(alignment: Alignment.center, children: [
-        sudokuWidget(bloc.state.sudoku,
-            cellSideLength(minScreenSideLength, bloc), 0.0, 0.0),
+        sudokuWidget(sudokuBloc.state.sudoku,
+            cellSideLength(minScreenSideLength, settingsBloc), 0.0, 0.0),
         TweenAnimationBuilder(
           duration: const Duration(seconds: 1),
           tween: Tween<double>(begin: 1.0, end: 0.0),
           onEnd: () {
             Future.delayed(const Duration(seconds: 1),
-                () => bloc.add(SudokuCellRepositioningRequested()));
+                () => sudokuBloc.add(SudokuCellRepositioningRequested()));
           },
           builder: (BuildContext context, Object? value, Widget? child) {
             return imageWidget(
-                bloc,
+                sudokuBloc,
                 value as double,
                 state.sudoku.imageFile!.path,
-                cellSideLength(minScreenSideLength, bloc));
+                cellSideLength(minScreenSideLength, settingsBloc));
           },
         )
       ]);
@@ -183,35 +187,37 @@ class SudokuWidget extends StatelessWidget {
         duration: const Duration(seconds: 1),
         tween: Tween<double>(
             begin: 0.0,
-            end: bloc.state.settings.gridSettings.subgridDividerSize),
+            end: settingsBloc.state.settings.gridSettings.subgridDividerSize),
         onEnd: () {
           Future.delayed(const Duration(seconds: 1),
-              () => bloc.add(SudokuCellValueRecognitionRequested()));
+              () => sudokuBloc.add(SudokuCellValueRecognitionRequested()));
         },
         builder: (BuildContext context, Object? value, Widget? child) {
           return sudokuWidget(
-              bloc.state.sudoku,
-              cellSideLength(minScreenSideLength, bloc),
+              sudokuBloc.state.sudoku,
+              cellSideLength(minScreenSideLength, settingsBloc),
               min((value as double),
-                  bloc.state.settings.gridSettings.cellDividerSize),
+                  settingsBloc.state.settings.gridSettings.cellDividerSize),
               value);
         },
       );
     }
 
     return sudokuWidget(
-        bloc.state.sudoku,
-        cellSideLength(minScreenSideLength, bloc),
-        bloc.state.settings.gridSettings.cellDividerSize,
-        bloc.state.settings.gridSettings.subgridDividerSize);
+        sudokuBloc.state.sudoku,
+        cellSideLength(minScreenSideLength, settingsBloc),
+        settingsBloc.state.settings.gridSettings.cellDividerSize,
+        settingsBloc.state.settings.gridSettings.subgridDividerSize);
   }
 
-  double cellSideLength(double minOfScreenSides, SudokuBloc bloc) {
+  double cellSideLength(double minOfScreenSides, SettingsBloc bloc) {
     logger.finest('cellSideLength');
     final cellDividerSize = bloc.state.settings.gridSettings.cellDividerSize;
     final subgridDividerSize =
         bloc.state.settings.gridSettings.subgridDividerSize;
-    final sudokuSize = bloc.state.sudoku.size.columns; // sudoku is square
+    // final sudokuSize = bloc.state.sudoku.size.columns; // sudoku is square
+    final sudokuSize =
+        bloc.state.settings.sudokuSettings.sudokuSize; // sudoku is square
     final sudokuSubgridSize = sqrt(sudokuSize); // subgrids are squares
 
     return (minOfScreenSides -
@@ -235,24 +241,30 @@ class SudokuWidget extends StatelessWidget {
         return currState is SudokuInitial ||
             currState is SudokuImageSelectionSucceed ||
             currState is SudokuImageDividingSucceed ||
-            currState is SudokuCellRepositioning ||
-            currState is SudokuSettingsOpened ||
-            currState is SudokuSettingsChngd;
+            currState is SudokuCellRepositioning; // ||
       },
-      builder: (context, state) {
+      builder: (context, sudokuState) {
         logger.info('BlockBuilder');
-        final bloc = BlocProvider.of<SudokuBloc>(context);
-        return
-            SizedBox(
-                width: wh,
-                height: wh,
-                child:
-                Stack(alignment: Alignment.center, children: [
-                  Center(child: buildSizedBoxChild(bloc, state, wh)),
+        final sudokuBloc = BlocProvider.of<SudokuBloc>(context);
+
+        return SizedBox(
+            width: wh,
+            height: wh,
+            child: BlocBuilder<PresentationBloc, PresentationState>(
+              builder: (context, presentationState) {
+                final presentationBloc = BlocProvider.of<PresentationBloc>(context);
+                final settingsBloc = BlocProvider.of<SettingsBloc>(context);
+                return Stack(alignment: Alignment.center, children: [
+                  Center(
+                      child: buildSizedBoxChild(
+                          sudokuBloc, settingsBloc, sudokuState, wh)),
                   Visibility(
-                      visible: state is SudokuSettingsOpened, child: SettingsDialog())
-                ])
-                );
+                    visible: presentationState is SettingsDialogIsOpened,
+                    child: SettingsDialog(),
+                  )
+                ]);
+              },
+            ));
       },
     );
   }

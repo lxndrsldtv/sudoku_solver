@@ -5,6 +5,8 @@ import 'package:logging/logging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_texts.dart';
+import 'package:sudoku_solver/blocs/presentation/presentation_bloc.dart';
+import 'package:sudoku_solver/blocs/settings/settings_bloc.dart';
 
 import './blocs/sudoku_bloc.dart';
 import './pages/sudoku_home_page.dart';
@@ -24,8 +26,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
-    return BlocProvider(
-      create: (context) => SudokuBloc(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<SudokuBloc>(create: (context) => SudokuBloc()),
+        BlocProvider<SettingsBloc>(create: (context) => SettingsBloc()),
+        BlocProvider<PresentationBloc>(create: (context) => PresentationBloc()),
+      ],
       child: MaterialApp(
         title: 'Sudoku Solver',
         localizationsDelegates: AppLocalizations.localizationsDelegates,
