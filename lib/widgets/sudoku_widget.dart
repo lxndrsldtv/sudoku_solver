@@ -6,11 +6,10 @@ import 'package:logging/logging.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
-import 'package:sudoku_solver/blocs/presentation/presentation_bloc.dart';
-import 'package:sudoku_solver/blocs/presentation/presentation_states.dart';
-import 'package:sudoku_solver/blocs/settings/settings_bloc.dart';
-import 'package:sudoku_solver/blocs/settings/settings_states.dart';
-import 'package:sudoku_solver/widgets/settings_dialog.dart';
+import '../blocs/presentation/presentation_bloc.dart';
+import '../blocs/presentation/presentation_states.dart';
+import '../blocs/settings/settings_bloc.dart';
+import '../widgets/settings_dialog.dart';
 
 import '../blocs/sudoku_events.dart';
 import '../blocs/sudoku_states.dart';
@@ -252,7 +251,6 @@ class SudokuWidget extends StatelessWidget {
             height: wh,
             child: BlocBuilder<PresentationBloc, PresentationState>(
               builder: (context, presentationState) {
-                final presentationBloc = BlocProvider.of<PresentationBloc>(context);
                 final settingsBloc = BlocProvider.of<SettingsBloc>(context);
                 return Stack(alignment: Alignment.center, children: [
                   Center(

@@ -24,9 +24,6 @@ class SudokuBloc extends Bloc<SudokuEvent, SudokuState> {
     on<SudokuImageProcessRequested>(_onImageProcessRequested);
     on<SudokuCellValueRecognitionRequested>(_onCellValueRecognitionRequested);
     on<SudokuCalculatePressed>(_onCalculateSudokuPressed);
-    // on<SudokuSettingsPressed>(_onOpenSettingsPressed);
-    // on<SudokuImageInCellSwitched>(_onImageInCellSwitched);
-    // on<SudokuSettingsChanged>(_onSettingsChanged);
     on<SudokuCellRepositioningRequested>(_onCellRepositioningRequested);
   }
 
@@ -45,13 +42,9 @@ class SudokuBloc extends Bloc<SudokuEvent, SudokuState> {
 
     emit(null == imageFile
         ? state
-        // : SudokuImageSelectionSucceed(state: state, imageFile: imageFile));
         : SudokuImageSelectionSucceed(
-            // state: SudokuState(
-            //     sudoku: state.sudoku.copyWith(image: imageFile),
-            //     settings: state.settings),
-            state: SudokuState(
-              sudoku: state.sudoku.copyWith(image: imageFile),
+            state: SudokuInitial(
+              sudokuModel: state.sudoku.copyWith(image: imageFile),
             ),
             imageFile: imageFile));
     logger.info('Emitted state: SudokuImageSelectionSucceed');
@@ -84,10 +77,8 @@ class SudokuBloc extends Bloc<SudokuEvent, SudokuState> {
 
     final newSudoku = state.sudoku.copyWith(cells: cellsWithImages);
 
-    // emit(SudokuImageDividingSucceed(state: state, cellImages: cellImages));
     emit(SudokuImageDividingSucceed(
-        // state: SudokuState(sudoku: newSudoku, settings: state.settings),
-        state: SudokuState(sudoku: newSudoku),
+        state: SudokuInitial(sudokuModel: newSudoku),
         cellImages: cellImages));
     logger.info('Emitted state: SudokuImageDividingSucceed');
   }
@@ -97,14 +88,6 @@ class SudokuBloc extends Bloc<SudokuEvent, SudokuState> {
       Emitter<SudokuState> emit) async {
     logger.info('Received event: SudokuCellValueRecognitionRequested');
 
-    // if (state is! SudokuImageDividingSucceed) {
-    //   logger.shout('Error! Current state is not SudokuImageDividingSucceed');
-    //   return;
-    // }
-
-    // emit(SudokuCellValuesRecognitionInProgress(
-    //     state: state,
-    //     cellImages: (state as SudokuImageDividingSucceed).cellImages));
     emit(SudokuCellValuesRecognitionInProgress(state: state));
 
     if (state is! SudokuCellValuesRecognitionInProgress) {
@@ -113,8 +96,6 @@ class SudokuBloc extends Bloc<SudokuEvent, SudokuState> {
       return;
     }
 
-    // final cellImages =
-    //     (state as SudokuCellValuesRecognitionInProgress).cellImages;
     final cellImages = state.sudoku.cells.map((c) => c.image);
 
     var index = 0;
@@ -162,7 +143,6 @@ class SudokuBloc extends Bloc<SudokuEvent, SudokuState> {
         logger.shout('Error deleting BMP file. Index = $index', e);
       }
     }
-    // emit(SudokuCellValuesRecognitionFinished(sudoku: state.sudoku, cellImages: state. cellImages))
   }
 
   void _onCalculateSudokuPressed(
@@ -281,44 +261,10 @@ class SudokuBloc extends Bloc<SudokuEvent, SudokuState> {
     }
   }
 
-  // void _onOpenSettingsPressed(
-  //     SudokuEvent event, Emitter<SudokuState> emit) async {
-  //   state is! SudokuSettingsOpened
-  //       ? emit(SudokuSettingsOpened(previousState: state))
-  //       : emit((state as SudokuSettingsOpened).previousState);
-  // }
-
-  // void _onImageInCellSwitched(
-  //     SudokuEvent event, Emitter<SudokuState> emit) async {
-  //   logger.info('Received event: $event');
-  //
-  //   state.settings.cellSettings.displayCellImage =
-  //       !state.settings.cellSettings.displayCellImage;
-  //   // emit(state);
-  //   emit(SudokuSettingsChngd(previousState: state));
-  //   emit(SudokuSettingsOpened(previousState: state));
-  //
-  //   logger.info('Emitted state: $state');
-  // }
-
-  // void _onSettingsChanged(SudokuEvent event, Emitter<SudokuState> emit) async {
-  //   logger.info('Received event: $event');
-  //
-  //   // state.settings.cellSettings.displayCellImage = !state.settings.cellSettings.displayCellImage;
-  //   // emit(state);
-  //   emit(SudokuSettingsChngd(previousState: state));
-  //
-  //   logger.info('Emitted state: $state');
-  // }
-
   void _onCellRepositioningRequested(
       SudokuEvent event, Emitter<SudokuState> emit) async {
     logger.info('Received event: $event');
-
-    // state.settings.cellSettings.displayCellImage = !state.settings.cellSettings.displayCellImage;
-    // emit(state);
     emit(SudokuCellRepositioning(previousState: state));
-
     logger.info('Emitted state: $state');
   }
 }

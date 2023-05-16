@@ -1,28 +1,21 @@
 import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
-// import 'package:sudoku_solver/models/app_settings_model.dart';
-import 'package:sudoku_solver/models/sudoku_cell_model.dart';
-import 'package:sudoku_solver/models/sudoku_model.dart';
 
-// abstract
-class SudokuState {
-  // SudokuState({required this.sudoku, required this.settings});
+import '../models/sudoku_cell_model.dart';
+import '../models/sudoku_model.dart';
+
+abstract class SudokuState {
   SudokuState({required this.sudoku});
 
-  SudokuState.fromState({required SudokuState state})
-      : sudoku = state.sudoku;
-        // settings = state.settings;
+  SudokuState.fromState({required SudokuState state}) : sudoku = state.sudoku;
 
   final SudokuModel sudoku;
-  // final AppSettingsModel settings;
 }
 
 class SudokuInitial extends SudokuState {
-  SudokuInitial()
-      : super(sudoku: SudokuModel.empty());
-      // : super(sudoku: SudokuModel.empty(), settings: AppSettingsModel());
-// final SudokuModel sudoku;
+  SudokuInitial({SudokuModel? sudokuModel})
+      : super(sudoku: sudokuModel ?? SudokuModel.empty());
 }
 
 class SudokuCellReplaced extends SudokuState {
@@ -62,10 +55,7 @@ class SudokuCellReplaced extends SudokuState {
     newSudokuCells.replaceRange(index, index + 1, [cell]);
     final newSudoku = SudokuModel(cells: newSudokuCells);
     return SudokuCellReplaced(
-      state: SudokuState(
-        sudoku: newSudoku,
-        // settings: state.settings,
-      ),
+      state: SudokuInitial(sudokuModel: newSudoku),
       changedCell: cell,
     );
   }
@@ -90,12 +80,8 @@ class SudokuImageDividingSucceed extends SudokuState {
 }
 
 class SudokuCellValuesRecognitionInProgress extends SudokuState {
-  SudokuCellValuesRecognitionInProgress(
-      // {required SudokuState state, required this.cellImages})
-      {required SudokuState state})
+  SudokuCellValuesRecognitionInProgress({required SudokuState state})
       : super.fromState(state: state);
-
-// List<Uint8List> cellImages;
 }
 
 class SudokuCellValuesRecognitionFinished extends SudokuState {
@@ -105,20 +91,6 @@ class SudokuCellValuesRecognitionFinished extends SudokuState {
 
   List<Uint8List> cellImages;
 }
-
-// class SudokuSettingsOpened extends SudokuState {
-//   SudokuSettingsOpened({required this.previousState})
-//       : super.fromState(state: previousState);
-//
-//   final SudokuState previousState;
-// }
-
-// class SudokuSettingsChngd extends SudokuState {
-//   SudokuSettingsChngd({required this.previousState})
-//       : super.fromState(state: previousState);
-//
-//   final SudokuState previousState;
-// }
 
 class SudokuCellRepositioning extends SudokuState {
   SudokuCellRepositioning({required this.previousState})

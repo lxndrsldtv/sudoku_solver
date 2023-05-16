@@ -29,14 +29,20 @@ class NeumorphicButtonBar extends StatelessWidget {
               style: buttonStyle,
               child: Center(child: NeumorphicText(label, style: textStyle)))));
 
-  List<Widget> buttons(BuildContext context, SudokuBloc sudokuBloc, PresentationBloc presentationBloc) => [
-        buildButton(AppLocalizations.of(context)!.btnLabelImage, () => sudokuBloc.add(SudokuSelectImagePressed())),
+  List<Widget> buttons(BuildContext context, SudokuBloc sudokuBloc,
+          PresentationBloc presentationBloc) =>
+      [
+        buildButton(AppLocalizations.of(context)!.btnLabelImage,
+            () => sudokuBloc.add(SudokuSelectImagePressed())),
         const SizedBox(width: 2.0, height: 8.0),
-        buildButton(AppLocalizations.of(context)!.btnLabelSolve, () => sudokuBloc.add(SudokuCalculatePressed())),
+        buildButton(AppLocalizations.of(context)!.btnLabelSolve,
+            () => sudokuBloc.add(SudokuCalculatePressed())),
         const SizedBox(width: 2.0, height: 8.0),
-        buildButton(AppLocalizations.of(context)!.btnLabelRestart, () => sudokuBloc.add(SudokuStarted())),
+        buildButton(AppLocalizations.of(context)!.btnLabelRestart,
+            () => sudokuBloc.add(SudokuStarted())),
         const SizedBox(width: 2.0, height: 8.0),
-        buildButton(AppLocalizations.of(context)!.btnLabelSettings, () => presentationBloc.add(SettingsButtonPressed())),
+        buildButton(AppLocalizations.of(context)!.btnLabelSettings,
+            () => presentationBloc.add(SettingsButtonPressed())),
       ];
 
   @override

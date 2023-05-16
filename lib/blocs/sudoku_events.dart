@@ -25,12 +25,4 @@ class SudokuSelectImagePressed extends SudokuEvent {}
 
 class SudokuCalculatePressed extends SudokuEvent {}
 
-// class SudokuSettingsPressed extends SudokuEvent {}
-
-// class SudokuSettingsChanged extends SudokuEvent {}
-//
-// class SudokuSettingClosed extends SudokuEvent {}
-
-// class SudokuImageInCellSwitched extends SudokuEvent {}
-
 class SudokuCellRepositioningRequested extends SudokuEvent {}

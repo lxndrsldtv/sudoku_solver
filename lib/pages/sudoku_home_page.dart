@@ -28,7 +28,7 @@ class SudokuHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sudokuBloc = BlocProvider.of<SudokuBloc>(context);
+    // final sudokuBloc = BlocProvider.of<SudokuBloc>(context);
 
     final screenOrientation = MediaQuery.of(context).orientation;
 

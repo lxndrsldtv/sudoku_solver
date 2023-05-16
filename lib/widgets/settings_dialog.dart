@@ -54,7 +54,8 @@ class SettingsDialog extends StatelessWidget {
                   ]))
             ])
           ],
-          onClose: () => presentationBloc.add(SettingsDialogCloseButtonPressed()));
+          onClose: () =>
+              presentationBloc.add(SettingsDialogCloseButtonPressed()));
     });
   }
 }
