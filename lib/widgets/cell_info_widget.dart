@@ -1,7 +1,8 @@
 import 'dart:typed_data';
 
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
-import 'package:sudoku_solver/models/sudoku_cell_model.dart';
+
+import '../models/sudoku_cell_model.dart';
 
 class CellInfoWidget extends StatelessWidget {
   const CellInfoWidget({Key? key, required this.cell}) : super(key: key);
@@ -9,6 +10,7 @@ class CellInfoWidget extends StatelessWidget {
   final SudokuCellModel cell;
 
   Widget styleText(String text) => NeumorphicText(text,
+      key: Key(text),
       style: const NeumorphicStyle(
           color: Colors.black87, depth: 1.0, intensity: 1.0),
       textStyle: NeumorphicTextStyle(fontSize: 16));
@@ -40,11 +42,13 @@ class CellInfoWidget extends StatelessWidget {
             buildLabel(styleText('Cell image:')),
             buildValue(cellImage.isNotEmpty
                 ? Image.memory(
+                    key: const Key('Image'),
                     cellImage,
                     fit: BoxFit.fill,
                     alignment: Alignment.centerRight,
                   )
-                : const SizedBox(width: 0.0, height: 0.0))
+                : const SizedBox(
+                    key: Key('EmptyImage'), width: 0.0, height: 0.0))
           ])
         ]));
   }
