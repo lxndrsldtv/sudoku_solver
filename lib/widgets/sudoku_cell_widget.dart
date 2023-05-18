@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
-import 'package:sudoku_solver/blocs/settings/settings_bloc.dart';
-import 'package:sudoku_solver/blocs/settings/settings_states.dart';
-import 'package:sudoku_solver/widgets/set_cell_value_dialog.dart';
 
+import '../blocs/settings/settings_bloc.dart';
+import '../blocs/settings/settings_states.dart';
 import '../blocs/sudoku_bloc.dart';
 import '../blocs/sudoku_events.dart';
 import '../blocs/sudoku_states.dart';
 import '../models/sudoku_cell_model.dart';
+import '../widgets/set_cell_value_dialog.dart';
 
 class SudokuCellWidget extends StatelessWidget {
   SudokuCellWidget({
@@ -17,8 +17,9 @@ class SudokuCellWidget extends StatelessWidget {
     required this.cellIndex,
   });
 
-  final logger = Logger('SudokuCellWidget2');
+  final logger = Logger('SudokuCellWidget');
 
+  // final key;
   final double cellSize;
   final int cellIndex;
 
@@ -28,6 +29,7 @@ class SudokuCellWidget extends StatelessWidget {
     logger.info('state: ${sudokuBloc.state}');
 
     return BlocBuilder<SudokuBloc, SudokuState>(
+      key: Key('bbc$cellIndex'),
       buildWhen: (prevState, currState) {
         logger.info('prevState is $prevState,  currState is $currState');
         final doRebuild = (currState is SudokuCellReplaced &&
@@ -80,7 +82,9 @@ class SudokuCellWidget extends StatelessWidget {
                                         child: Image.memory(cell.image!))
                                     : const SizedBox(width: 0.0, height: 0.0);
                               })),
-                          Text(cell.value == 0 ? '' : cell.value.toString(),
+                          Text(
+                              key: Key('cell_text_$cellIndex'),
+                              cell.value == 0 ? '' : cell.value.toString(),
                               style: TextStyle(
                                   fontSize: 18,
                                   color: cell.testedValues.isEmpty

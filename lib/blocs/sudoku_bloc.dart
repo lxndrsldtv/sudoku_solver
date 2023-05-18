@@ -2,22 +2,23 @@ import 'dart:collection';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image/image.dart' as image_tools;
-import 'package:image_picker/image_picker.dart';
 import 'package:logging/logging.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:sudoku_solver/services/sudoku_solver_service.dart';
 
-import '../services/sudoku_utils_service.dart';
 import './sudoku_events.dart';
 import './sudoku_states.dart';
+import '../services/image_path_provider.dart';
+import '../services/sudoku_solver_service.dart';
+import '../services/sudoku_utils_service.dart';
 
 class SudokuBloc extends Bloc<SudokuEvent, SudokuState> {
   final logger = Logger('SudokuBloc');
+  final ImagePathProvider imagePathProvider;
 
-  SudokuBloc() : super(SudokuInitial()) {
+  SudokuBloc({required this.imagePathProvider}) : super(SudokuInitial()) {
     on<SudokuStarted>(_onStarted);
     on<SudokuSelectImagePressed>(_onSelectImagePressed);
     on<SudokuCellValueSelected>(_onCellValueSelected);
@@ -37,8 +38,9 @@ class SudokuBloc extends Bloc<SudokuEvent, SudokuState> {
   void _onSelectImagePressed(
       SudokuSelectImagePressed event, Emitter<SudokuState> emit) async {
     logger.info('Received event: SudokuSelectImagePressed');
-    final imageFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+    // final imageFile =
+    //     await ImagePicker().pickImage(source: ImageSource.gallery);
+    final imageFile = await imagePathProvider.getFilePath();
 
     emit(null == imageFile
         ? state
@@ -78,8 +80,7 @@ class SudokuBloc extends Bloc<SudokuEvent, SudokuState> {
     final newSudoku = state.sudoku.copyWith(cells: cellsWithImages);
 
     emit(SudokuImageDividingSucceed(
-        state: SudokuInitial(sudokuModel: newSudoku),
-        cellImages: cellImages));
+        state: SudokuInitial(sudokuModel: newSudoku), cellImages: cellImages));
     logger.info('Emitted state: SudokuImageDividingSucceed');
   }
 

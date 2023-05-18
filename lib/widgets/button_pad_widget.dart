@@ -13,6 +13,7 @@ class ButtonPadWidget extends StatelessWidget {
       buttons.add(Container(
           margin: const EdgeInsets.all(4.0),
           child: NeumorphicButton(
+              key: Key('bpb${button + 1}'),
               style: style,
               minDistance: -1.0,
               onPressed: () => Navigator.of(context).pop(button + 1),

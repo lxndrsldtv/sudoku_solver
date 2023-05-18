@@ -6,14 +6,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_texts.dart';
 import 'package:logging/logging.dart';
 
-import './blocs/sudoku_bloc.dart';
-import './pages/sudoku_home_page.dart';
+import './image_path_provider.dart';
 import '../blocs/presentation/presentation_bloc.dart';
 import '../blocs/settings/settings_bloc.dart';
-import '../services/image_path_provider.dart';
+import '../blocs/sudoku_bloc.dart';
+import '../pages/sudoku_home_page.dart';
 
 Future<void> main() async {
-  Logger.root.level = Level.SHOUT;
+  Logger.root.level = Level.ALL;
   Logger.root.onRecord.listen((record) {
     log('${record.level.name}: ${record.loggerName}: ${record.message}');
   });
@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider<SudokuBloc>(
             create: (context) =>
-                SudokuBloc(imagePathProvider: ImagePickerPathProvider())),
+                SudokuBloc(imagePathProvider: StubImagePathProvider())),
         BlocProvider<SettingsBloc>(create: (context) => SettingsBloc()),
         BlocProvider<PresentationBloc>(create: (context) => PresentationBloc()),
       ],

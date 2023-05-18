@@ -2,24 +2,22 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:collection/collection.dart';
-import 'package:logging/logging.dart';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:logging/logging.dart';
+
+import './sudoku_cell_widget.dart';
 import '../blocs/presentation/presentation_bloc.dart';
 import '../blocs/presentation/presentation_states.dart';
 import '../blocs/settings/settings_bloc.dart';
-import '../widgets/settings_dialog.dart';
-
+import '../blocs/sudoku_bloc.dart';
 import '../blocs/sudoku_events.dart';
 import '../blocs/sudoku_states.dart';
-import '../blocs/sudoku_bloc.dart';
 import '../models/sudoku_model.dart';
-
-import './sudoku_cell_widget.dart';
+import '../widgets/settings_dialog.dart';
 
 class SudokuWidget extends StatelessWidget {
-  final logger = Logger('SudokuWidget1');
+  final logger = Logger('SudokuWidget');
 
   SudokuWidget({super.key});
 
@@ -96,7 +94,10 @@ class SudokuWidget extends StatelessWidget {
     // fill row with cells
     sudoku.cells.foldIndexed(<Widget>[], (index, prevValue, cell) {
       prevValue.add(Flexible(
-          child: SudokuCellWidget(cellSize: cellSize, cellIndex: cell.index)));
+          child: SudokuCellWidget(
+              key: Key('ci${cell.index.toString()}'),
+              cellSize: cellSize,
+              cellIndex: cell.index)));
       // add vertical divider (SizedBox of some width between cells)
       prevValue.add(verticalDivider(
           index: index,

@@ -2,10 +2,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_texts.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 
-import '../blocs/sudoku_bloc.dart';
-import '../blocs/sudoku_events.dart';
 import '../blocs/presentation/presentation_bloc.dart';
 import '../blocs/presentation/presentation_events.dart';
+import '../blocs/sudoku_bloc.dart';
+import '../blocs/sudoku_events.dart';
 
 class NeumorphicButtonBar extends StatelessWidget {
   NeumorphicButtonBar({
@@ -20,28 +20,40 @@ class NeumorphicButtonBar extends StatelessWidget {
   double _buttonWidth = 0.0;
   double _buttonHeight = 0.0;
 
-  Widget buildButton(String label, void Function() onPressed) => Flexible(
-      child: SizedBox(
-          width: _buttonWidth,
-          height: _buttonHeight,
-          child: NeumorphicButton(
-              onPressed: onPressed,
-              style: buttonStyle,
-              child: Center(child: NeumorphicText(label, style: textStyle)))));
+  Widget buildButton(
+          Key? key, String label, void Function() onPressed) =>
+      Flexible(
+          child: SizedBox(
+              width: _buttonWidth,
+              height: _buttonHeight,
+              child: NeumorphicButton(
+                  key: key,
+                  onPressed: onPressed,
+                  style: buttonStyle,
+                  child:
+                      Center(child: NeumorphicText(label, style: textStyle)))));
 
   List<Widget> buttons(BuildContext context, SudokuBloc sudokuBloc,
           PresentationBloc presentationBloc) =>
       [
-        buildButton(AppLocalizations.of(context)!.btnLabelImage,
+        buildButton(
+            const Key('select_image_btn'),
+            AppLocalizations.of(context)!.btnLabelImage,
             () => sudokuBloc.add(SudokuSelectImagePressed())),
         const SizedBox(width: 2.0, height: 8.0),
-        buildButton(AppLocalizations.of(context)!.btnLabelSolve,
+        buildButton(
+            const Key('solve_btn'),
+            AppLocalizations.of(context)!.btnLabelSolve,
             () => sudokuBloc.add(SudokuCalculatePressed())),
         const SizedBox(width: 2.0, height: 8.0),
-        buildButton(AppLocalizations.of(context)!.btnLabelRestart,
+        buildButton(
+            const Key('reset_btn'),
+            AppLocalizations.of(context)!.btnLabelRestart,
             () => sudokuBloc.add(SudokuStarted())),
         const SizedBox(width: 2.0, height: 8.0),
-        buildButton(AppLocalizations.of(context)!.btnLabelSettings,
+        buildButton(
+            const Key('settings_btn'),
+            AppLocalizations.of(context)!.btnLabelSettings,
             () => presentationBloc.add(SettingsButtonPressed())),
       ];
 
