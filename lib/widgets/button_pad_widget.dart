@@ -1,21 +1,17 @@
 import 'package:collection/collection.dart';
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:flutter/material.dart';
 
 class ButtonPadWidget extends StatelessWidget {
   const ButtonPadWidget({Key? key}) : super(key: key);
-
-  static const style =
-      NeumorphicStyle(color: Colors.white, depth: 1.0, intensity: 1.0);
 
   List<Widget> buildButtonRows(BuildContext context) {
     List<Widget> buttons = [];
     for (int button = 0; button < 9; button++) {
       buttons.add(Container(
           margin: const EdgeInsets.all(4.0),
-          child: NeumorphicButton(
+          child: ElevatedButton(
               key: Key('bpb${button + 1}'),
-              style: style,
-              minDistance: -1.0,
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
               onPressed: () => Navigator.of(context).pop(button + 1),
               child: Text((button + 1).toString()))));
     }
@@ -34,12 +30,12 @@ class ButtonPadWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
       Container(
-          margin: const EdgeInsets.all(4.0),
-          child: NeumorphicButton(
-              onPressed: () => Navigator.of(context).pop(0),
-              style: style,
-              minDistance: -1.0,
-              child: const Text('Clear cell'))),
+        margin: const EdgeInsets.all(4.0),
+        child: ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+            onPressed: () => Navigator.of(context).pop(0),
+            child: const Text('Clear cell')),
+      ),
       ...buildButtonRows(context)
     ]);
   }

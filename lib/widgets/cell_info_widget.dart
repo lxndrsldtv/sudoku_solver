@@ -1,6 +1,5 @@
 import 'dart:typed_data';
-
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:flutter/material.dart';
 
 import '../models/sudoku_cell_model.dart';
 
@@ -9,11 +8,11 @@ class CellInfoWidget extends StatelessWidget {
 
   final SudokuCellModel cell;
 
-  Widget styleText(String text) => NeumorphicText(text,
-      key: Key(text),
-      style: const NeumorphicStyle(
-          color: Colors.black87, depth: 1.0, intensity: 1.0),
-      textStyle: NeumorphicTextStyle(fontSize: 16));
+  Widget styleText(String text) => Text(
+        text,
+        key: Key(text),
+        style: const TextStyle(color: Colors.black87, fontSize: 16),
+      );
 
   Widget buildLabel(Widget child) =>
       Flexible(child: Container(alignment: Alignment.centerLeft, child: child));
@@ -25,11 +24,10 @@ class CellInfoWidget extends StatelessWidget {
     final cellValue = cell.value;
     final cellImage = cell.image ?? Uint8List(0);
 
-    return Neumorphic(
+    return Container( //Neumorphic(
         margin: const EdgeInsets.all(8.0),
         padding: const EdgeInsets.all(8.0),
-        style: const NeumorphicStyle(
-            color: Colors.white, depth: -1.0, intensity: 1),
+        color: Colors.white,
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(
             children: [

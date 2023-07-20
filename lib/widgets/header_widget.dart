@@ -1,4 +1,4 @@
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:flutter/material.dart';
 
 class HeaderWidget extends StatelessWidget {
   const HeaderWidget({Key? key}) : super(key: key);
@@ -6,36 +6,31 @@ class HeaderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const style =
-    NeumorphicStyle(border: NeumorphicBorder(width: 1.0),
-        depth: 2.0,
-        color: Colors.white,
-        intensity: 1.0);
-    final textStyle =
-    NeumorphicTextStyle(fontSize: 40, fontWeight: FontWeight.bold);
+    TextStyle(color: Colors.black, fontSize: 40, fontWeight: FontWeight.bold);
     final screenOrientation = MediaQuery
         .of(context)
         .orientation;
 
     return screenOrientation == Orientation.portrait
-        ? Row(
+        ? const Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          NeumorphicText('S', style: style, textStyle: textStyle),
-          NeumorphicText('U', style: style, textStyle: textStyle),
-          NeumorphicText('D', style: style, textStyle: textStyle),
-          NeumorphicText('O', style: style, textStyle: textStyle),
-          NeumorphicText('K', style: style, textStyle: textStyle),
-          NeumorphicText('U', style: style, textStyle: textStyle),
+          Text('S', style: style),
+          Text('U', style: style),
+          Text('D', style: style),
+          Text('O', style: style),
+          Text('K', style: style),
+          Text('U', style: style),
         ])
-        : Column(
+        : const Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          NeumorphicText('S', style: style, textStyle: textStyle),
-          NeumorphicText('U', style: style, textStyle: textStyle),
-          NeumorphicText('D', style: style, textStyle: textStyle),
-          NeumorphicText('O', style: style, textStyle: textStyle),
-          NeumorphicText('K', style: style, textStyle: textStyle),
-          NeumorphicText('U', style: style, textStyle: textStyle),
+          Text('S', style: style),
+          Text('U', style: style),
+          Text('D', style: style),
+          Text('O', style: style),
+          Text('K', style: style),
+          Text('U', style: style),
         ]);
   }
 }

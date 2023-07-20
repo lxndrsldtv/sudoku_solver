@@ -1,4 +1,4 @@
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+// import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:logging/logging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,7 +7,7 @@ import 'package:sudoku_solver/widgets/header_widget.dart';
 import '../blocs/sudoku_bloc.dart';
 import '../blocs/sudoku_states.dart';
 
-import '../widgets/neumorphic_button_bar.dart';
+import '../widgets/cell_edit_button_bar.dart';
 import '../widgets/sudoku_widget.dart';
 
 class SudokuHomePage extends StatelessWidget {
@@ -22,7 +22,7 @@ class SudokuHomePage extends StatelessWidget {
       const Spacer(),
       SudokuWidget(),
       const Spacer(),
-      NeumorphicButtonBar()
+      CellEditButtonBar()
     ];
   }
 

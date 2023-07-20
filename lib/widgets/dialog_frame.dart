@@ -1,4 +1,4 @@
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 
 class DialogFrame extends StatelessWidget {
@@ -12,26 +12,22 @@ class DialogFrame extends StatelessWidget {
       : super(key: key);
 
   Widget title() {
-    return Neumorphic(
-        style: const NeumorphicStyle(color: Colors.green),
+    return Container(
+        color: Colors.green,
         margin: const EdgeInsets.all(8.0),
         padding: const EdgeInsets.all(8.0),
         child:
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          NeumorphicText(titleText,
-              style: const NeumorphicStyle(
-                  color: Colors.white, depth: 1.0, intensity: 1.0),
-              textStyle: NeumorphicTextStyle(fontSize: 22.0)),
-          NeumorphicButton(
+          Text(
+            titleText,
+            style: const TextStyle(color: Colors.white, fontSize: 22.0),
+          ),
+          ElevatedButton(
               onPressed: onClose,
-              padding: const EdgeInsets.all(4.0),
-              style: const NeumorphicStyle(
-                  depth: 1.0,
-                  intensity: 1.0,
-                  color: Colors.green,
-                  boxShape: NeumorphicBoxShape.circle()),
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green, shape: const CircleBorder()),
               child: const Icon(Icons.cancel_rounded,
-                  color: Colors.white, size: 28))
+                  color: Colors.white, size: 28)),
         ]));
   }
 

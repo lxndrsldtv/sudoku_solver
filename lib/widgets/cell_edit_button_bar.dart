@@ -1,37 +1,35 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_texts.dart';
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 
 import '../blocs/presentation/presentation_bloc.dart';
 import '../blocs/presentation/presentation_events.dart';
 import '../blocs/sudoku_bloc.dart';
 import '../blocs/sudoku_events.dart';
 
-class NeumorphicButtonBar extends StatelessWidget {
-  NeumorphicButtonBar({
+class CellEditButtonBar extends StatelessWidget {
+  CellEditButtonBar({
     super.key,
   });
 
-  final buttonStyle =
-      const NeumorphicStyle(color: Colors.white, depth: 1.0, intensity: 1.0);
   final textStyle =
-      const NeumorphicStyle(color: Colors.black, depth: 1.0, intensity: 1.0);
+      const TextStyle(color: Colors.black);
 
   double _buttonWidth = 0.0;
   double _buttonHeight = 0.0;
 
-  Widget buildButton(
-          Key? key, String label, void Function() onPressed) =>
+  Widget buildButton(Key? key, String label, void Function() onPressed) =>
       Flexible(
           child: SizedBox(
-              width: _buttonWidth,
-              height: _buttonHeight,
-              child: NeumorphicButton(
-                  key: key,
-                  onPressed: onPressed,
-                  style: buttonStyle,
-                  child:
-                      Center(child: NeumorphicText(label, style: textStyle)))));
+        width: _buttonWidth,
+        height: _buttonHeight,
+        child: ElevatedButton(
+          key: key,
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
+          child: Center(child: Text(label, style: textStyle)),
+        ),
+      ));
 
   List<Widget> buttons(BuildContext context, SudokuBloc sudokuBloc,
           PresentationBloc presentationBloc) =>
