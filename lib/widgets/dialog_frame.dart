@@ -13,22 +13,35 @@ class DialogFrame extends StatelessWidget {
 
   Widget title() {
     return Container(
-        color: Colors.green,
-        margin: const EdgeInsets.all(8.0),
-        padding: const EdgeInsets.all(8.0),
-        child:
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+      color: Colors.green,
+      margin: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
           Text(
+            key: const Key('DialogFrameTitleTextWidget'),
             titleText,
-            style: const TextStyle(color: Colors.white, fontSize: 22.0),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 22.0,
+            ),
           ),
           ElevatedButton(
-              onPressed: onClose,
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green, shape: const CircleBorder()),
-              child: const Icon(Icons.cancel_rounded,
-                  color: Colors.white, size: 28)),
-        ]));
+            onPressed: onClose,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              shape: const CircleBorder(),
+            ),
+            child: const Icon(
+              Icons.cancel_rounded,
+              color: Colors.white,
+              size: 28,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override

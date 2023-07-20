@@ -8,9 +8,9 @@ void main() {
 
   group('Sudoku application end-to-end test', () {
     testWidgets(
-        'tap on "Select Image" button, wait for cell values recognition, '
-        'correct wrongly recognized cell values, then tap on "Solve" button, '
-        'wait, till sudoku will be solved, i.e all cells will have values',
+        '\n\ntap on "Select Image" button, wait for cell values recognition, '
+        '\ncorrect wrongly recognized cell values, then tap on "Solve" button, '
+        '\nwait, till sudoku will be solved, i.e all cells will have values\n\n',
         (tester) async {
       sudoku_app.main();
       await tester.pumpAndSettle();
@@ -65,13 +65,19 @@ void main() {
       bool sudokuIsNotSolved = true;
       do {
         await tester.pumpAndSettle();
-        var cell79Finder = find.byKey(const Key('cell_text_79'));
-        if (cell79Finder.evaluate().isNotEmpty) {
-          var cell79Element = cell79Finder.evaluate().first;
-          var cell79Data = (cell79Element.widget as Text).data ?? '';
-          sudokuIsNotSolved = cell79Data == '';
+
+        for (var i = 1; i <= 80; i++) {
+          var cellFinder_ith = find.byKey(Key('cell_text_$i'));
+          if (cellFinder_ith.evaluate().isNotEmpty) {
+            var cellElement_ith = cellFinder_ith.evaluate().first;
+            var cellData_ith = (cellElement_ith.widget as Text).data ?? '';
+            if (cellData_ith == '') break;
+            if (i == 80) sudokuIsNotSolved = false;
+          }
         }
       } while (sudokuIsNotSolved);
+
+      // await tester.tap(find.byKey(const Key('settings_btn')));
     });
   });
 }

@@ -7,7 +7,7 @@ import 'package:sudoku_solver/widgets/header_widget.dart';
 import '../blocs/sudoku_bloc.dart';
 import '../blocs/sudoku_states.dart';
 
-import '../widgets/cell_edit_button_bar.dart';
+import '../widgets/control_button_bar.dart';
 import '../widgets/sudoku_widget.dart';
 
 class SudokuHomePage extends StatelessWidget {
@@ -22,7 +22,7 @@ class SudokuHomePage extends StatelessWidget {
       const Spacer(),
       SudokuWidget(),
       const Spacer(),
-      CellEditButtonBar()
+      ControlButtonBar()
     ];
   }
 

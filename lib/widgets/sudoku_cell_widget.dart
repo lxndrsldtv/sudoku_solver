@@ -98,7 +98,7 @@ class SudokuCellWidget extends StatelessWidget {
                           SetCellValueDialog(cellModel: cell));
                   logger.info('Dialog result = $res');
                   res != null
-                      ? sudokuBloc.add(SudokuCellValueSelected(
+                      ? sudokuBloc.add(SudokuReplaceCellValueRequested(
                           index: cell.index, value: res))
                       : {};
                 }));

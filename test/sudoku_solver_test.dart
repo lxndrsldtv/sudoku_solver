@@ -1,4 +1,5 @@
 import 'dart:collection';
+// import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -83,7 +84,7 @@ void main() {
         .fold('', (previousValue, element) => '$previousValue $element'));
   });
 
-  // test('Method solve, have to send partially solved sudoku to strem', () async {
+  // test('Method solve, have to send partially solved sudoku to stream', () async {
   //   final sudoku = SudokuModel(
   //       cells:   SudokuUtilsService.constructSudokuCellList(sudokuHard));
   //
@@ -100,26 +101,26 @@ void main() {
   //   }
   // });
 
-  test('groupListBy must group list elements by key', () async {
-    final lst = [1, 2, 3, 2, 3, 5];
-    final glt = lst
-        .groupListsBy((v) => v)
-        .values
-        .where((value) => value.length == 1)
-        .flattened;
-    print('$lst : $glt');
-  });
+  // test('groupListBy must group list elements by key', () async {
+  //   final lst = [1, 2, 3, 2, 3, 5];
+  //   final glt = lst
+  //       .groupListsBy((v) => v)
+  //       .values
+  //       .where((value) => value.length == 1)
+  //       .flattened;
+  //   print('$lst : $glt');
+  // });
 
   test('Some Sudoku can have singleton cells', () async {
     final sudoku = SudokuModel(
       cells: sudokuSimple.mapToSudokuCellModelList(),
     );
-    print('\n--- sudoku initial --------------------------------------\n');
-    print(sudoku.cells.foldIndexed(
-        '',
-        /* print list as table 9x9 */
-        (index, previousValue, element) =>
-            '$previousValue ${element.value == 0 ? '.' : element.value} ${(index + 1) % 9 == 0 ? '\n' : ''}'));
+    // print('\n--- sudoku initial --------------------------------------\n');
+    // print(sudoku.cells.foldIndexed(
+    //     '',
+    //     /* print list as table 9x9 */
+    //     (index, previousValue, element) =>
+    //         '$previousValue ${element.value == 0 ? '.' : element.value} ${(index + 1) % 9 == 0 ? '\n' : ''}'));
 
     final sudokuWithFilledPossibleValues =
         SudokuSolverService.fillCellsWithPossibleValues(sudoku);
@@ -128,8 +129,10 @@ void main() {
     final singletonCells =
         SudokuSolverService.findSingletonCells(subGridS11Cells.toList());
 
-    singletonCells.toList().forEach((cell) => print(
-        '${cell.row}:${cell.column}:${cell.value}:${cell.possibleValues}'));
+    // singletonCells.toList().forEach((cell) => print(
+    //     '${cell.row}:${cell.column}:${cell.value}:${cell.possibleValues}'));
+
+    expect(singletonCells.length, 2);
   });
 
 }

@@ -22,7 +22,7 @@ class SudokuCellReplaced extends SudokuState {
   SudokuCellReplaced({required SudokuState state, required this.changedCell})
       : super.fromState(state: state);
 
-  factory SudokuCellReplaced.replaceAtWithCopyWith({
+  factory SudokuCellReplaced.replaceCellAtIndexWith({
     required SudokuState state,
     required int index,
     String? row,
@@ -106,9 +106,6 @@ class SudokuSolvingInProgress extends SudokuState {
   final SudokuState previousState;
 }
 
-class SudokuSolvingInProgressSettingsOpened extends SudokuState {
-  SudokuSolvingInProgressSettingsOpened({required this.previousState})
-      : super.fromState(state: previousState);
-
-  final SudokuState previousState;
+class SudokuSingletonsFound extends SudokuState {
+  SudokuSingletonsFound({required super.sudoku});
 }
