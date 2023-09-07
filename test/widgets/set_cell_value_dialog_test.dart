@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sudoku_solver/models/sudoku_cell_model.dart';
@@ -16,6 +18,7 @@ void main() async {
             home: SetCellValueDialog(
           cellModel: SudokuCellModel(
               index: 0, row: 'R1', column: 'C1', subgrid: 'S01', value: 1),
+          cellImage: Uint8List(0),
         )));
 
         final finderByText1 = find.text('5');

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:sudoku_solver/integration_testing/main.dart' as sudoku_app;
+
+import 'main.dart' as sudoku_app;
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -44,19 +45,48 @@ void main() {
         await tester.pumpAndSettle();
       }
 
+      // recognition unreliable, so reset all values to correct
       await setCellValue(cellIndex: 3, newValue: 5);
+      await setCellValue(cellIndex: 4, newValue: 7);
+      await setCellValue(cellIndex: 5, newValue: 2);
+      await setCellValue(cellIndex: 6, newValue: 1);
+      await setCellValue(cellIndex: 7, newValue: 3);
       await setCellValue(cellIndex: 8, newValue: 6);
+
+      await setCellValue(cellIndex: 10, newValue: 5);
+      await setCellValue(cellIndex: 11, newValue: 2);
+      await setCellValue(cellIndex: 17, newValue: 7);
+
       await setCellValue(cellIndex: 26, newValue: 5);
+
+      await setCellValue(cellIndex: 28, newValue: 7);
       await setCellValue(cellIndex: 30, newValue: 6);
       await setCellValue(cellIndex: 32, newValue: 1);
       await setCellValue(cellIndex: 33, newValue: 5);
+
       await setCellValue(cellIndex: 36, newValue: 5);
+      await setCellValue(cellIndex: 39, newValue: 9);
+
+      await setCellValue(cellIndex: 45, newValue: 2);
+      await setCellValue(cellIndex: 49, newValue: 8);
       await setCellValue(cellIndex: 50, newValue: 5);
       await setCellValue(cellIndex: 52, newValue: 6);
+      await setCellValue(cellIndex: 53, newValue: 4);
+
+      await setCellValue(cellIndex: 54, newValue: 4);
+      await setCellValue(cellIndex: 55, newValue: 1);
       await setCellValue(cellIndex: 57, newValue: 3);
       await setCellValue(cellIndex: 58, newValue: 6);
+
+      await setCellValue(cellIndex: 63, newValue: 6);
+      await setCellValue(cellIndex: 69, newValue: 7);
+      await setCellValue(cellIndex: 70, newValue: 4);
+
+      await setCellValue(cellIndex: 75, newValue: 4);
       await setCellValue(cellIndex: 77, newValue: 9);
       await setCellValue(cellIndex: 78, newValue: 6);
+      await setCellValue(cellIndex: 80, newValue: 3);
+
 
       await tester.tap(find.byKey(const Key('solve_btn')));
       await tester.pumpAndSettle();
@@ -67,11 +97,11 @@ void main() {
         await tester.pumpAndSettle();
 
         for (var i = 1; i <= 80; i++) {
-          var cellFinder_ith = find.byKey(Key('cell_text_$i'));
-          if (cellFinder_ith.evaluate().isNotEmpty) {
-            var cellElement_ith = cellFinder_ith.evaluate().first;
-            var cellData_ith = (cellElement_ith.widget as Text).data ?? '';
-            if (cellData_ith == '') break;
+          var cellFinder = find.byKey(Key('cell_text_$i'));
+          if (cellFinder.evaluate().isNotEmpty) {
+            var cellElement = cellFinder.evaluate().first;
+            var cellData = (cellElement.widget as Text).data ?? '';
+            if (cellData == '') break;
             if (i == 80) sudokuIsNotSolved = false;
           }
         }

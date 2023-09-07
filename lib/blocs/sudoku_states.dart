@@ -1,21 +1,27 @@
 import 'dart:typed_data';
 
-import 'package:camera/camera.dart';
+import 'package:sudoku_solver/services/image_path_provider.dart';
+import 'package:sudoku_solver/services/image_process_service.dart';
 
 import '../models/sudoku_cell_model.dart';
 import '../models/sudoku_model.dart';
 
 abstract class SudokuState {
-  SudokuState({required this.sudoku});
+  SudokuState({required this.sudokuModel, this.sudokuImage});
 
-  SudokuState.fromState({required SudokuState state}) : sudoku = state.sudoku;
+  SudokuState.fromState({required SudokuState state})
+      : sudokuModel = state.sudokuModel,
+        sudokuImage = state.sudokuImage;
 
-  final SudokuModel sudoku;
+  final SudokuModel sudokuModel;
+  SudokuImage? sudokuImage;
 }
 
 class SudokuInitial extends SudokuState {
-  SudokuInitial({SudokuModel? sudokuModel})
-      : super(sudoku: sudokuModel ?? SudokuModel.empty());
+  SudokuInitial({SudokuModel? sudokuModel, SudokuImage? sudokuImage})
+      : super(
+            sudokuModel: sudokuModel ?? SudokuModel.empty(),
+            sudokuImage: sudokuImage);
 }
 
 class SudokuCellReplaced extends SudokuState {
@@ -29,16 +35,14 @@ class SudokuCellReplaced extends SudokuState {
     String? column,
     String? subgrid,
     int? value,
-    Uint8List? image,
     Set<int>? possibleValues,
     Set<int>? testedValues,
   }) {
-    final newCell = state.sudoku.cells[index].copyWith(
+    final newCell = state.sudokuModel.cells[index].copyWith(
       row: row,
       column: column,
       subgrid: subgrid,
       value: value,
-      image: image,
       possibleValues: possibleValues,
       testedValues: testedValues,
     );
@@ -51,11 +55,12 @@ class SudokuCellReplaced extends SudokuState {
     required int index,
     required SudokuCellModel cell,
   }) {
-    final newSudokuCells = List<SudokuCellModel>.from(state.sudoku.cells);
+    final newSudokuCells = List<SudokuCellModel>.from(state.sudokuModel.cells);
     newSudokuCells.replaceRange(index, index + 1, [cell]);
     final newSudoku = SudokuModel(cells: newSudokuCells);
     return SudokuCellReplaced(
-      state: SudokuInitial(sudokuModel: newSudoku),
+      state:
+          SudokuInitial(sudokuModel: newSudoku, sudokuImage: state.sudokuImage),
       changedCell: cell,
     );
   }
@@ -63,20 +68,26 @@ class SudokuCellReplaced extends SudokuState {
   final SudokuCellModel changedCell;
 }
 
-class SudokuImageSelectionSucceed extends SudokuState {
-  SudokuImageSelectionSucceed(
-      {required SudokuState state, required this.imageFile})
+class SudokuImageSelectionStarted extends SudokuState {
+  SudokuImageSelectionStarted(
+      {required this.imagePathProvider, required SudokuState state})
       : super.fromState(state: state);
 
-  final XFile imageFile;
+  final ImagePathProvider imagePathProvider;
 }
 
-class SudokuImageDividingSucceed extends SudokuState {
-  SudokuImageDividingSucceed(
-      {required SudokuState state, required this.cellImages})
-      : super.fromState(state: state);
+class SudokuImageSelectionInProgress extends SudokuState {
+  SudokuImageSelectionInProgress({required super.sudokuModel});
+}
 
-  List<Uint8List> cellImages;
+class SudokuImageSelectionSucceed extends SudokuState {
+  SudokuImageSelectionSucceed({required SudokuState state})
+      : super.fromState(state: state);
+}
+
+class SudokuCellsWithImages extends SudokuState {
+  SudokuCellsWithImages({required SudokuState state})
+      : super.fromState(state: state);
 }
 
 class SudokuCellValuesRecognitionInProgress extends SudokuState {
@@ -104,8 +115,4 @@ class SudokuSolvingInProgress extends SudokuState {
       : super.fromState(state: previousState);
 
   final SudokuState previousState;
-}
-
-class SudokuSingletonsFound extends SudokuState {
-  SudokuSingletonsFound({required super.sudoku});
 }

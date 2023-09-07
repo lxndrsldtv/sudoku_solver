@@ -13,7 +13,8 @@ class DialogFrame extends StatelessWidget {
 
   Widget title() {
     return Container(
-      color: Colors.green,
+      // color: Colors.green,
+      color: Colors.black,
       margin: const EdgeInsets.all(8.0),
       padding: const EdgeInsets.all(8.0),
       child: Row(
@@ -30,12 +31,12 @@ class DialogFrame extends StatelessWidget {
           ElevatedButton(
             onPressed: onClose,
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
+              backgroundColor: Colors.white,
               shape: const CircleBorder(),
             ),
             child: const Icon(
               Icons.cancel_rounded,
-              color: Colors.white,
+              color: Colors.black,
               size: 28,
             ),
           ),

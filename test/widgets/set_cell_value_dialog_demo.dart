@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_texts.dart';
 import 'package:sudoku_solver/models/sudoku_cell_model.dart';
@@ -19,6 +21,7 @@ class CellEditButtonBarWidgetDemo extends StatelessWidget {
       home: SetCellValueDialog(
         cellModel: SudokuCellModel(
             index: 0, row: 'R1', column: 'C1', subgrid: 'S01', value: 1),
+        cellImage: Uint8List(0),
       ),
       // ),
     );

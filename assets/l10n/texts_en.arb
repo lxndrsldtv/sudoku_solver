@@ -1,6 +1,18 @@
 {
-    "btnLabelImage": "Image",
+    "btnLabelImage": "Select image",
+    "btnLabelCamera": "Take picture",
     "btnLabelSolve": "Solve",
     "btnLabelRestart": "Restart",
-    "btnLabelSettings": "Settings"
+    "btnLabelSettings": "Settings",
+
+    "dlgSettings_Title": "Settings",
+    "dlgSettings_lblShowImgInCellCorner": "Show image in cell corner",
+
+    "dlgSetCellValue_Title": "Set cell value",
+    "dlgSetCellValue_lblCellValue": "Cell value:",
+    "dlgSetCellValue_lblCellImage": "Cell image:",
+
+    "btnPad_btnClearCell": "Clear cell",
+
+    "txtProcessingImage": "Processing image..."
 }

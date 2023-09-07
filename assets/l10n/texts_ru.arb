@@ -1,6 +1,18 @@
 {
-    "btnLabelImage": "Изображение",
+    "btnLabelImage": "Выбрать изображение",
+    "btnLabelCamera": "Сделать фото",
     "btnLabelSolve": "Решить",
     "btnLabelRestart": "Заново",
-    "btnLabelSettings": "Настройки"
+    "btnLabelSettings": "Настройки",
+
+    "dlgSettings_Title": "Настройки",
+    "dlgSettings_lblShowImgInCellCorner": "Показывать изображение в ячейке",
+
+    "dlgSetCellValue_Title": "Присвоить ячейке значение",
+    "dlgSetCellValue_lblCellValue": "Значение ячейки:",
+    "dlgSetCellValue_lblCellImage": "Изображение ячейки:",
+
+    "btnPad_btnClearCell": "Очистить ячейку",
+
+    "txtProcessingImage": "Обработка изображения..."
 }

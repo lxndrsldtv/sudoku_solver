@@ -18,11 +18,13 @@ Future<void> main() async {
     log('${record.level.name}: ${record.loggerName}: ${record.message}');
   });
 
-  runApp(const MyApp());
+  runApp(SudokuSolver(imagePathProvider: ImagePickerPathProvider()));
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class SudokuSolver extends StatelessWidget {
+  const SudokuSolver({super.key, required this.imagePathProvider});
+
+  final ImagePathProvider imagePathProvider;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +33,8 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider<SudokuBloc>(
             create: (context) =>
-                SudokuBloc(imagePathProvider: ImagePickerPathProvider())),
+                // SudokuBloc(imagePathProvider: ImagePickerPathProvider())),
+                SudokuBloc(imagePathProvider: imagePathProvider)),
         BlocProvider<SettingsBloc>(create: (context) => SettingsBloc()),
         BlocProvider<PresentationBloc>(create: (context) => PresentationBloc()),
       ],

@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 class SudokuCellModel {
   SudokuCellModel({
     required this.index,
@@ -7,7 +5,6 @@ class SudokuCellModel {
     required this.column,
     required this.subgrid,
     required this.value,
-    this.image,
     this.possibleValues = const {},
     this.testedValues = const {},
   });
@@ -17,7 +14,6 @@ class SudokuCellModel {
   final String column;
   final String subgrid;
   final int value;
-  final Uint8List? image;
   final Set<int> possibleValues;
   final Set<int> testedValues;
 
@@ -27,7 +23,6 @@ class SudokuCellModel {
       String? column,
       String? subgrid,
       int? value,
-      Uint8List? image,
       Set<int>? possibleValues,
       Set<int>? testedValues}) {
     return SudokuCellModel(
@@ -36,7 +31,6 @@ class SudokuCellModel {
         column: column ?? this.column,
         subgrid: subgrid ?? this.subgrid,
         value: value ?? this.value,
-        image: image ?? this.image,
         possibleValues: possibleValues ?? this.possibleValues,
         testedValues: testedValues ?? this.testedValues);
   }

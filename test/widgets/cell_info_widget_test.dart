@@ -1,11 +1,14 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:image/image.dart' as image_tools;
 import 'package:sudoku_solver/models/sudoku_cell_model.dart';
 import 'package:sudoku_solver/widgets/cell_info_widget.dart';
 
-import './cell_info_widget_test_data.dart';
-
 void main() async {
+  final cellImage = await image_tools.decodePngFile('./test/widgets/cell.png');
+
   setUpAll(() {
     TestWidgetsFlutterBinding.ensureInitialized();
   });
@@ -19,6 +22,7 @@ void main() async {
             home: CellInfoWidget(
           cell: SudokuCellModel(
               index: 0, row: 'R1', column: 'C1', subgrid: 'S01', value: 0),
+          cellImage: Uint8List(0),
         )));
 
         expect(find.byKey(const Key('Cell value:')), findsOneWidget);
@@ -34,6 +38,7 @@ void main() async {
             home: CellInfoWidget(
           cell: SudokuCellModel(
               index: 0, row: 'R1', column: 'C1', subgrid: 'S01', value: 1),
+          cellImage: Uint8List(0),
         )));
 
         expect(find.byKey(const Key('Cell value:')), findsOneWidget);
@@ -47,14 +52,11 @@ void main() async {
           (tester) async {
         await tester.pumpWidget(MaterialApp(
             home: CellInfoWidget(
-                cell: SudokuCellModel(
-          index: 0,
-          row: 'R1',
-          column: 'C1',
-          subgrid: 'S01',
-          value: 0,
-          image: cellImage,
-        ))));
+          cell: SudokuCellModel(
+              index: 0, row: 'R1', column: 'C1', subgrid: 'S01', value: 0),
+          cellImage:
+              image_tools.encodeBmp(cellImage ?? image_tools.Image.empty()),
+        )));
 
         expect(find.byKey(const Key('Cell value:')), findsOneWidget);
         expect(find.byKey(const Key('')), findsOneWidget);
@@ -66,14 +68,11 @@ void main() async {
       testWidgets('Test displaying cell with value and image', (tester) async {
         await tester.pumpWidget(MaterialApp(
             home: CellInfoWidget(
-                cell: SudokuCellModel(
-          index: 0,
-          row: 'R1',
-          column: 'C1',
-          subgrid: 'S01',
-          value: 7,
-          image: cellImage,
-        ))));
+          cell: SudokuCellModel(
+              index: 0, row: 'R1', column: 'C1', subgrid: 'S01', value: 7),
+          cellImage:
+              image_tools.encodeBmp(cellImage ?? image_tools.Image.empty()),
+        )));
 
         expect(find.byKey(const Key('Cell value:')), findsOneWidget);
         expect(find.byKey(const Key('7')), findsOneWidget);

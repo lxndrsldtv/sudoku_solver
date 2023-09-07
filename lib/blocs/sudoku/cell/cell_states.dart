@@ -9,5 +9,3 @@ abstract class CellState {
 class CellInitialised extends CellState {
   CellInitialised({required super.cellModel});
 }
-
-// class CellReplaced extends

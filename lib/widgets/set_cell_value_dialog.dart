@@ -1,16 +1,21 @@
-import 'package:flutter/material.dart';
+import 'dart:typed_data';
 
-import '../models/sudoku_cell_model.dart';
+import 'package:flutter/material.dart';
 
 import './button_pad_widget.dart';
 import './cell_info_widget.dart';
 import './dialog_frame.dart';
+import '../models/sudoku_cell_model.dart';
 
 class SetCellValueDialog extends StatelessWidget {
-  const SetCellValueDialog({Key? key, required this.cellModel})
-      : super(key: key);
+  const SetCellValueDialog({
+    Key? key,
+    required this.cellModel,
+    required this.cellImage,
+  }) : super(key: key);
 
   final SudokuCellModel cellModel;
+  final Uint8List cellImage;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +26,10 @@ class SetCellValueDialog extends StatelessWidget {
       titleText: 'Set cell value',
       children: screenOrientation == Orientation.portrait
           ? [
-              CellInfoWidget(cell: cellModel),
+              CellInfoWidget(
+                cell: cellModel,
+                cellImage: cellImage,
+              ),
               const SizedBox(height: 16.0),
               const ButtonPadWidget(),
             ]
@@ -29,7 +37,10 @@ class SetCellValueDialog extends StatelessWidget {
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
                 SizedBox(
                     width: mediaQuery.size.width / 2,
-                    child: CellInfoWidget(cell: cellModel)),
+                    child: CellInfoWidget(
+                      cell: cellModel,
+                      cellImage: cellImage,
+                    )),
                 const ButtonPadWidget(),
               ])
             ],

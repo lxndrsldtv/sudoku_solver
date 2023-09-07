@@ -15,34 +15,38 @@ Future<void> main() async {
   group('CellInfoWidget ', (() {
     testWidgets('Test control buttons are displayed with labels',
         (tester) async {
-      await tester.pumpWidget(MultiBlocProvider(
-        providers: [
-          BlocProvider<SudokuBloc>(
-              create: (context) =>
-                  SudokuBloc(imagePathProvider: ImagePickerPathProvider())),
-          // BlocProvider<SettingsBloc>(create: (context) => SettingsBloc()),
-          BlocProvider<PresentationBloc>(
-              create: (context) => PresentationBloc()),
-        ],
-        child: MaterialApp(
+      await tester.pumpWidget(
+        MultiBlocProvider(
+          providers: [
+            BlocProvider<SudokuBloc>(
+                create: (context) =>
+                    SudokuBloc(imagePathProvider: ImagePickerPathProvider())),
+            // BlocProvider<SettingsBloc>(create: (context) => SettingsBloc()),
+            BlocProvider<PresentationBloc>(
+                create: (context) => PresentationBloc()),
+          ],
+          child: const MaterialApp(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             // locale: Locale('ru'),
-            home: ControlButtonBar()),
-      ));
+            home: Scaffold(
+              body: ControlButtonBar(),
+            ),
+          ),
+        ),
+      );
 
-      final btnSelectImage = find.byKey(const Key('select_image_btn'));
-      expect(btnSelectImage, findsOneWidget);
-      expect(find.text('Image'), findsOneWidget);
+      expect(find.byKey(const Key('select_image_btn')), findsOneWidget);
+      expect(find.byIcon(Icons.image_search_rounded), findsOneWidget);
 
       expect(find.byKey(const Key('solve_btn')), findsOneWidget);
-      expect(find.text('Solve'), findsOneWidget);
+      expect(find.byIcon(Icons.play_circle), findsOneWidget);
 
       expect(find.byKey(const Key('reset_btn')), findsOneWidget);
-      expect(find.text('Restart'), findsOneWidget);
+      expect(find.byIcon(Icons.restart_alt), findsOneWidget);
 
       expect(find.byKey(const Key('settings_btn')), findsOneWidget);
-      expect(find.text('Settings'), findsOneWidget);
+      expect(find.byIcon(Icons.settings), findsOneWidget);
     });
   }));
 }

@@ -4,7 +4,7 @@ import 'package:cross_file/cross_file.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
-import '../services/image_path_provider.dart';
+import 'package:sudoku_solver/services/image_path_provider.dart';
 
 class StubImagePathProvider implements ImagePathProvider {
   @override

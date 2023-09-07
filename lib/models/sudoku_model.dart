@@ -1,29 +1,30 @@
 import 'dart:math';
 
 import 'package:collection/collection.dart';
-import 'package:cross_file/cross_file.dart';
 
 import 'sudoku_cell_model.dart';
 
 class SudokuModel {
   final SudokuSize size;
   final List<SudokuCellModel> cells;
-  final XFile? imageFile;
 
-  SudokuModel(
-      {required this.cells, this.size = const SudokuSize(), this.imageFile});
+  SudokuModel({
+    required this.cells,
+    this.size = const SudokuSize(),
+  });
 
   SudokuModel.empty({this.size = const SudokuSize()})
       : cells = (List<int>.generate(size.cells, (index) => 0))
-            .mapToSudokuCellModelList(),
-        imageFile = null;
+            .mapToSudokuCellModelList();
 
-  SudokuModel copyWith(
-      {SudokuSize? size, List<SudokuCellModel>? cells, XFile? image}) {
+  SudokuModel copyWith({
+    SudokuSize? size,
+    List<SudokuCellModel>? cells,
+  }) {
     return SudokuModel(
-        size: size ?? this.size,
-        cells: cells ?? this.cells,
-        imageFile: image ?? imageFile);
+      size: size ?? this.size,
+      cells: cells ?? this.cells,
+    );
   }
 
   bool isSolved() {

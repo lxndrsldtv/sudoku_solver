@@ -1,9 +1,11 @@
 import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:logging/logging.dart';
 
 import './sudoku_cell_widget.dart';
@@ -14,7 +16,7 @@ import '../blocs/sudoku_bloc.dart';
 import '../blocs/sudoku_events.dart';
 import '../blocs/sudoku_states.dart';
 import '../models/sudoku_model.dart';
-import '../widgets/settings_dialog.dart';
+import 'settings_dialog.dart';
 
 class SudokuWidget extends StatelessWidget {
   final logger = Logger('SudokuWidget');
@@ -61,8 +63,8 @@ class SudokuWidget extends StatelessWidget {
         (index + 1) ~/ (sudoku.size.columns * sqrt(sudoku.size.columns)) ==
             sqrt(sudoku.size.columns);
 
-    final lastSubgridDivider =
-        Row(children: const [SizedBox(width: 0.0, height: 0.0)]);
+    const lastSubgridDivider =
+        Row(children: [SizedBox(width: 0.0, height: 0.0)]);
 
     final ordinarySubgridDivider = Row(children: [
       SizedBox(
@@ -106,10 +108,11 @@ class SudokuWidget extends StatelessWidget {
           subgridDividerSize: subgridDividerSize));
 
       // when row completely filled, add completed row to list
-      if ((index + 1) % sudoku.size.columns == 0) {
+      final rowFilledCompletely = (index + 1) % sudoku.size.columns == 0;
+      if (rowFilledCompletely) {
         rows.add(Row(
             mainAxisAlignment: MainAxisAlignment.center, children: prevValue));
-        // add horizontal divider (empty row of some height)
+        // add horizontal divider of rows (empty row of some height)
         rows.add(horizontalDivider(
             index: index,
             sudoku: sudoku,
@@ -126,8 +129,11 @@ class SudokuWidget extends StatelessWidget {
     return rows;
   }
 
-  Column sudokuWidget(SudokuModel sudoku, double cellSideLength,
-          double cellDividerSize, double subgridDividerSize) =>
+  Column sudokuWidget(
+          {required SudokuModel sudoku,
+          required double cellSideLength,
+          required double cellDividerSize,
+          required double subgridDividerSize}) =>
       Column(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -137,77 +143,101 @@ class SudokuWidget extends StatelessWidget {
               cellDividerSize: cellDividerSize,
               subgridDividerSize: subgridDividerSize));
 
-  Opacity imageWidget(SudokuBloc bloc, double opacity, String path,
-          double cellSideLength) =>
+  Opacity imageWidget(
+          {required SudokuBloc bloc,
+          required double opacity,
+          String? path,
+          Uint8List? image,
+          required double cellSideLength}) =>
       Opacity(
-          opacity: opacity,
-          child: SizedBox(
-              width: cellSideLength * bloc.state.sudoku.size.columns,
-              height: cellSideLength * bloc.state.sudoku.size.rows,
-              child: Image.file(File(path))));
+        opacity: opacity,
+        child: SizedBox(
+            width: cellSideLength * bloc.state.sudokuModel.size.columns,
+            height: cellSideLength * bloc.state.sudokuModel.size.rows,
+            child: path != null
+                ? Image.file(File(path))
+                : image != null
+                    ? Image.memory(image)
+                    : Container()),
+      );
 
   Widget buildSizedBoxChild(SudokuBloc sudokuBloc, SettingsBloc settingsBloc,
       SudokuState state, double minScreenSideLength) {
+    //--------------------------------------------------------------------------
     if (state is SudokuImageSelectionSucceed) {
       Future.delayed(const Duration(seconds: 1),
-          () => sudokuBloc.add(SudokuImageProcessRequested()));
+          () => sudokuBloc.add(SudokuImageRenderingDone()));
 
-      return Stack(alignment: Alignment.center, children: [
-        sudokuWidget(sudokuBloc.state.sudoku,
-            cellSideLength(minScreenSideLength, settingsBloc), 0.0, 0.0),
-        imageWidget(sudokuBloc, 1.0, state.sudoku.imageFile!.path,
-            cellSideLength(minScreenSideLength, settingsBloc)),
-      ]);
+      return imageWidget(
+          bloc: sudokuBloc,
+          opacity: 1.0,
+          image: state.sudokuImage!.encodedBmpImage,
+          cellSideLength:
+              cellSideLength(minScreenSideLength, settingsBloc)); //,
     }
 
-    if (state is SudokuImageDividingSucceed) {
-      return Stack(alignment: Alignment.center, children: [
-        sudokuWidget(sudokuBloc.state.sudoku,
-            cellSideLength(minScreenSideLength, settingsBloc), 0.0, 0.0),
-        TweenAnimationBuilder(
-          duration: const Duration(seconds: 1),
-          tween: Tween<double>(begin: 1.0, end: 0.0),
-          onEnd: () {
-            Future.delayed(const Duration(seconds: 1),
-                () => sudokuBloc.add(SudokuCellRepositioningRequested()));
-          },
-          builder: (BuildContext context, Object? value, Widget? child) {
-            return imageWidget(
-                sudokuBloc,
-                value as double,
-                state.sudoku.imageFile!.path,
-                cellSideLength(minScreenSideLength, settingsBloc));
-          },
-        )
-      ]);
+    //--------------------------------------------------------------------------
+    if (state is SudokuCellsWithImages) {
+      return Stack(
+        alignment: Alignment.center,
+        children: [
+          sudokuWidget(
+            sudoku: sudokuBloc.state.sudokuModel,
+            cellSideLength: cellSideLength(minScreenSideLength, settingsBloc),
+            cellDividerSize: 0.0,
+            subgridDividerSize: 0.0,
+          ),
+          TweenAnimationBuilder(
+            duration: const Duration(seconds: 1),
+            curve: Curves.easeInExpo,
+            tween: Tween<double>(begin: 1.0, end: 0.0),
+            onEnd: () {
+              sudokuBloc.add(SudokuImageHidden());
+            },
+            builder: (BuildContext context, Object? value, Widget? child) {
+              return imageWidget(
+                  bloc: sudokuBloc,
+                  opacity: value as double,
+                  image: state.sudokuImage!.encodedBmpImage,
+                  cellSideLength:
+                      cellSideLength(minScreenSideLength, settingsBloc));
+            },
+          )
+        ],
+      );
     }
 
+    //--------------------------------------------------------------------------
     if (state is SudokuCellRepositioning) {
       return TweenAnimationBuilder(
         duration: const Duration(seconds: 1),
+        curve: Curves.easeInExpo,
         tween: Tween<double>(
             begin: 0.0,
             end: settingsBloc.state.settings.gridSettings.subgridDividerSize),
         onEnd: () {
-          Future.delayed(const Duration(seconds: 1),
-              () => sudokuBloc.add(SudokuCellValueRecognitionRequested()));
+          sudokuBloc.add(SudokuCellsRepositioningDone());
         },
         builder: (BuildContext context, Object? value, Widget? child) {
           return sudokuWidget(
-              sudokuBloc.state.sudoku,
-              cellSideLength(minScreenSideLength, settingsBloc),
-              min((value as double),
-                  settingsBloc.state.settings.gridSettings.cellDividerSize),
-              value);
+            sudoku: sudokuBloc.state.sudokuModel,
+            cellSideLength: cellSideLength(minScreenSideLength, settingsBloc),
+            cellDividerSize: min((value as double),
+                settingsBloc.state.settings.gridSettings.cellDividerSize),
+            subgridDividerSize: value,
+          );
         },
       );
     }
 
+    //--------------------------------------------------------------------------
     return sudokuWidget(
-        sudokuBloc.state.sudoku,
-        cellSideLength(minScreenSideLength, settingsBloc),
-        settingsBloc.state.settings.gridSettings.cellDividerSize,
-        settingsBloc.state.settings.gridSettings.subgridDividerSize);
+      sudoku: sudokuBloc.state.sudokuModel,
+      cellSideLength: cellSideLength(minScreenSideLength, settingsBloc),
+      cellDividerSize: settingsBloc.state.settings.gridSettings.cellDividerSize,
+      subgridDividerSize:
+          settingsBloc.state.settings.gridSettings.subgridDividerSize,
+    );
   }
 
   double cellSideLength(double minOfScreenSides, SettingsBloc bloc) {
@@ -215,7 +245,6 @@ class SudokuWidget extends StatelessWidget {
     final cellDividerSize = bloc.state.settings.gridSettings.cellDividerSize;
     final subgridDividerSize =
         bloc.state.settings.gridSettings.subgridDividerSize;
-    // final sudokuSize = bloc.state.sudoku.size.columns; // sudoku is square
     final sudokuSize =
         bloc.state.settings.sudokuSettings.sudokuSize; // sudoku is square
     final sudokuSubgridSize = sqrt(sudokuSize); // subgrids are squares
@@ -239,31 +268,54 @@ class SudokuWidget extends StatelessWidget {
       buildWhen: (prevState, currState) {
         logger.info('prevState is $prevState,  currState is $currState');
         return currState is SudokuInitial ||
+            currState is SudokuImageSelectionStarted ||
             currState is SudokuImageSelectionSucceed ||
-            currState is SudokuImageDividingSucceed ||
-            currState is SudokuCellRepositioning; // ||
+            currState is SudokuCellsWithImages ||
+            currState is SudokuCellRepositioning ||
+            currState is SudokuImageSelectionInProgress; // ||
       },
       builder: (context, sudokuState) {
         logger.info('BlockBuilder');
+        logger.info('state: $sudokuState');
+
         final sudokuBloc = BlocProvider.of<SudokuBloc>(context);
 
+        // if (sudokuBloc.state is SudokuImageSelectionStarted) {
+        if (sudokuState is SudokuImageSelectionStarted) {
+          final imagePathProvider = sudokuState.imagePathProvider;
+          Future<void>.delayed(const Duration(milliseconds: 1), () async {
+            // final imageFile =
+            //     await ImagePicker().pickImage(source: ImageSource.gallery);
+            final imageFile = await imagePathProvider.getFilePath();
+            logger.info('imageFile: ${imageFile?.path}');
+            sudokuBloc.add(SudokuImageSelectionDone(imageFile: imageFile));
+          });
+          sudokuBloc.add(SudokuImagePickerStarted());
+          return const CircularProgressIndicator();
+        }
+
+        if (sudokuBloc.state is SudokuImageSelectionInProgress) {
+          return const CircularProgressIndicator();
+        }
+
         return SizedBox(
-            width: wh,
-            height: wh,
-            child: BlocBuilder<PresentationBloc, PresentationState>(
-              builder: (context, presentationState) {
-                final settingsBloc = BlocProvider.of<SettingsBloc>(context);
-                return Stack(alignment: Alignment.center, children: [
-                  Center(
-                      child: buildSizedBoxChild(
-                          sudokuBloc, settingsBloc, sudokuState, wh)),
-                  Visibility(
-                    visible: presentationState is SettingsDialogIsOpened,
-                    child: SettingsDialog(),
-                  )
-                ]);
-              },
-            ));
+          width: wh,
+          height: wh,
+          child: BlocBuilder<PresentationBloc, PresentationState>(
+            builder: (context, presentationState) {
+              final settingsBloc = BlocProvider.of<SettingsBloc>(context);
+              return Stack(alignment: Alignment.center, children: [
+                Center(
+                    child: buildSizedBoxChild(
+                        sudokuBloc, settingsBloc, sudokuState, wh)),
+                Visibility(
+                  visible: presentationState is SettingsDialogIsOpened,
+                  child: SettingsDialog(),
+                )
+              ]);
+            },
+          ),
+        );
       },
     );
   }

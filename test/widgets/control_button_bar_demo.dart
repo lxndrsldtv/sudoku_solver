@@ -23,7 +23,7 @@ class CellEditButtonBarWidgetDemo extends StatelessWidget {
         // BlocProvider<SettingsBloc>(create: (context) => SettingsBloc()),
         BlocProvider<PresentationBloc>(create: (context) => PresentationBloc()),
       ],
-      child: MaterialApp(
+      child: const MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           // locale: Locale('ru'),

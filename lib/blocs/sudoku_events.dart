@@ -1,24 +1,13 @@
-import '../models/sudoku_model.dart';
+import 'package:cross_file/cross_file.dart';
+import 'package:image/image.dart';
 
 abstract class SudokuEvent {}
 
-// class SudokuInitializeWithRequested extends SudokuEvent {
-//   SudokuInitializeWithRequested({required this.sudokuModel});
-//
-//   final SudokuModel sudokuModel;
-// }
-
 class SudokuStarted extends SudokuEvent {}
 
-class SudokuImageSelected extends SudokuEvent {}
+class SudokuImageRenderingDone extends SudokuEvent {}
 
-class SudokuImageDivided extends SudokuEvent {}
-
-class SudokuImageProcessRequested extends SudokuEvent {}
-
-class SudokuCellValueRecognitionRequested extends SudokuEvent {}
-
-class SudokuCellPressed extends SudokuEvent {}
+class SudokuCellsRepositioningDone extends SudokuEvent {}
 
 class SudokuReplaceCellValueRequested extends SudokuEvent {
   SudokuReplaceCellValueRequested({required this.index, required this.value});
@@ -27,22 +16,22 @@ class SudokuReplaceCellValueRequested extends SudokuEvent {
   final int value;
 }
 
-class SudokuChangeCellValueActionCancelled extends SudokuEvent {}
-
 class SudokuSelectImagePressed extends SudokuEvent {}
 
 class SudokuCalculatePressed extends SudokuEvent {}
 
-class SudokuCellRepositioningRequested extends SudokuEvent {}
+class SudokuImageHidden extends SudokuEvent {}
 
-class SudokuImageRecognitionInCellAtIndexRequested extends SudokuEvent {
-  final int cellIndex;
+class SudokuImagePickerStarted extends SudokuEvent {}
 
-  SudokuImageRecognitionInCellAtIndexRequested({required this.cellIndex});
+class SudokuImageSelected extends SudokuEvent {
+  final Image image;
+
+  SudokuImageSelected({required this.image});
 }
 
-class SudokuFindSingletonsRequested extends SudokuEvent {}
+class SudokuImageSelectionDone extends SudokuEvent {
+  final XFile? imageFile;
 
-class SudokuSolvingStarted extends SudokuEvent {}
-
-class SudokuSolvingFinished extends SudokuEvent {}
+  SudokuImageSelectionDone({this.imageFile});
+}

@@ -11,8 +11,6 @@ class SudokuCellSettingsModel {
 class SudokuGridSettingsModel {
   double cellDividerSize = 1.0;
   double  subgridDividerSize = 8.0;
-  // double cellDividerSize = 0.0;
-  // double  subgridDividerSize = 0.0;
 }
 
 class SudokuSettingsModel {

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
@@ -7,7 +9,6 @@ import '../blocs/settings/settings_states.dart';
 import '../blocs/sudoku_bloc.dart';
 import '../blocs/sudoku_events.dart';
 import '../blocs/sudoku_states.dart';
-import '../models/sudoku_cell_model.dart';
 import '../widgets/set_cell_value_dialog.dart';
 
 class SudokuCellWidget extends StatelessWidget {
@@ -19,14 +20,12 @@ class SudokuCellWidget extends StatelessWidget {
 
   final logger = Logger('SudokuCellWidget');
 
-  // final key;
   final double cellSize;
   final int cellIndex;
 
   @override
   Widget build(BuildContext context) {
     final sudokuBloc = BlocProvider.of<SudokuBloc>(context);
-    logger.info('state: ${sudokuBloc.state}');
 
     return BlocBuilder<SudokuBloc, SudokuState>(
       key: Key('bbc$cellIndex'),
@@ -34,20 +33,23 @@ class SudokuCellWidget extends StatelessWidget {
         logger.info('prevState is $prevState,  currState is $currState');
         final doRebuild = (currState is SudokuCellReplaced &&
                 currState.changedCell.index == cellIndex) ||
-            currState is SudokuImageDividingSucceed ||
+            currState is SudokuCellsWithImages ||
             currState is SudokuCellRepositioning ||
             currState is SudokuInitial;
         logger.info('doRebuild = $doRebuild');
         return doRebuild;
       },
       builder: (context, state) {
-        logger.info('BlockBuilder');
+        // logger.info('BlockBuilder');
+        // logger.info('state: $state');
+        // logger.info('state.sudokuModel: ${state.sudokuModel}');
+        // logger.info('state.sudokuImage: ${state.sudokuImage}');
 
-        late final SudokuCellModel cell;
-        if (state is SudokuCellReplaced) {
-          cell = state.changedCell;
-        } else {
-          cell = state.sudoku.cells[cellIndex];
+        Uint8List? cellImage;
+        final cell = state.sudokuModel.cells[cellIndex];
+        if (state.sudokuImage != null) {
+          cellImage =
+              state.sudokuImage!.sudokuCellImages[cellIndex].encodedBmpImage;
         }
 
         return SizedBox(
@@ -60,10 +62,10 @@ class SudokuCellWidget extends StatelessWidget {
                     elevation: 4.0,
                     shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.all(Radius.circular(5.0)))),
-                child: state is SudokuImageDividingSucceed ||
+                child: state is SudokuCellsWithImages ||
                         state is SudokuCellRepositioning
-                    ? null != cell.image
-                        ? Image.memory(cell.image!)
+                    ? null != cellImage
+                        ? Image.memory(cellImage)
                         : SizedBox(width: cellSize, height: cellSize)
                     : SizedBox(
                         width: cellSize,
@@ -73,13 +75,13 @@ class SudokuCellWidget extends StatelessWidget {
                               alignment: Alignment.topLeft,
                               child: BlocBuilder<SettingsBloc, SettingsState>(
                                   builder: (context, settingsState) {
-                                return null != cell.image &&
+                                return null != cellImage &&
                                         settingsState.settings.cellSettings
                                             .displayCellImage
                                     ? SizedBox(
                                         width: cellSize / 3, // 12.0,
                                         height: cellSize / 3, // 12.0,
-                                        child: Image.memory(cell.image!))
+                                        child: Image.memory(cellImage))
                                     : const SizedBox(width: 0.0, height: 0.0);
                               })),
                           Text(
@@ -94,9 +96,11 @@ class SudokuCellWidget extends StatelessWidget {
                 onPressed: () async {
                   int? res = await showDialog(
                       context: context,
-                      builder: (context) =>
-                          SetCellValueDialog(cellModel: cell));
-                  logger.info('Dialog result = $res');
+                      builder: (context) => SetCellValueDialog(
+                            cellModel: cell,
+                            cellImage: cellImage ?? Uint8List(0),
+                          ));
+                  // logger.info('Dialog result = $res');
                   res != null
                       ? sudokuBloc.add(SudokuReplaceCellValueRequested(
                           index: cell.index, value: res))
