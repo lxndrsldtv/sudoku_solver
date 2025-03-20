@@ -1,4 +1,3 @@
-import 'package:cross_file/cross_file.dart';
 import 'package:image/image.dart';
 
 abstract class SudokuEvent {}
@@ -31,7 +30,9 @@ class SudokuImageSelected extends SudokuEvent {
 }
 
 class SudokuImageSelectionDone extends SudokuEvent {
-  final XFile? imageFile;
+  // final XFile? imageFile;
+  final Image? image;
 
-  SudokuImageSelectionDone({this.imageFile});
+  // SudokuImageSelectionDone({this.imageFile});
+  SudokuImageSelectionDone({this.image});
 }

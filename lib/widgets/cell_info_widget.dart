@@ -1,13 +1,12 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_texts.dart';
+import 'package:sudoku_solver/l10n/app_texts.dart';
 
 import '../models/sudoku_cell_model.dart';
 
 class CellInfoWidget extends StatelessWidget {
-  const CellInfoWidget({Key? key, required this.cell, required this.cellImage})
-      : super(key: key);
+  const CellInfoWidget({super.key, required this.cell, required this.cellImage});
 
   final SudokuCellModel cell;
   final Uint8List cellImage;
@@ -18,8 +17,7 @@ class CellInfoWidget extends StatelessWidget {
         style: const TextStyle(color: Colors.black87, fontSize: 16),
       );
 
-  Widget buildLabel(Widget child) =>
-      Flexible(child: Container(alignment: Alignment.centerLeft, child: child));
+  Widget buildLabel(Widget child) => Flexible(child: Container(alignment: Alignment.centerLeft, child: child));
 
   Widget buildValue(Widget child) => Flexible(child: Center(child: child));
 
@@ -35,17 +33,13 @@ class CellInfoWidget extends StatelessWidget {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(
             children: [
-              buildLabel(styleText(
-                  AppLocalizations.of(context)?.dlgSetCellValue_lblCellValue ??
-                      'Cell value:')),
+              buildLabel(styleText(AppLocalizations.of(context)?.dlgSetCellValue_lblCellValue ?? 'Cell value:')),
               buildValue(styleText(cellValue != 0 ? cellValue.toString() : '')),
             ],
           ),
           const Divider(height: 8.0),
           Row(children: [
-            buildLabel(styleText(
-                AppLocalizations.of(context)?.dlgSetCellValue_lblCellImage ??
-                    'Cell image:')),
+            buildLabel(styleText(AppLocalizations.of(context)?.dlgSetCellValue_lblCellImage ?? 'Cell image:')),
             buildValue(cellImage.isNotEmpty
                 ? Image.memory(
                     key: const Key('Image'),
@@ -53,8 +47,7 @@ class CellInfoWidget extends StatelessWidget {
                     fit: BoxFit.fill,
                     alignment: Alignment.centerRight,
                   )
-                : const SizedBox(
-                    key: Key('EmptyImage'), width: 0.0, height: 0.0))
+                : const SizedBox(key: Key('EmptyImage'), width: 0.0, height: 0.0))
           ])
         ]));
   }

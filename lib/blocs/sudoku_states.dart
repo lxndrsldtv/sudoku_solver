@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:sudoku_solver/services/image_path_provider.dart';
 import 'package:sudoku_solver/services/image_process_service.dart';
 
 import '../models/sudoku_cell_model.dart';
@@ -18,15 +17,11 @@ abstract class SudokuState {
 }
 
 class SudokuInitial extends SudokuState {
-  SudokuInitial({SudokuModel? sudokuModel, SudokuImage? sudokuImage})
-      : super(
-            sudokuModel: sudokuModel ?? SudokuModel.empty(),
-            sudokuImage: sudokuImage);
+  SudokuInitial({SudokuModel? sudokuModel, super.sudokuImage}) : super(sudokuModel: sudokuModel ?? SudokuModel.empty());
 }
 
 class SudokuCellReplaced extends SudokuState {
-  SudokuCellReplaced({required SudokuState state, required this.changedCell})
-      : super.fromState(state: state);
+  SudokuCellReplaced({required super.state, required this.changedCell}) : super.fromState();
 
   factory SudokuCellReplaced.replaceCellAtIndexWith({
     required SudokuState state,
@@ -46,8 +41,7 @@ class SudokuCellReplaced extends SudokuState {
       possibleValues: possibleValues,
       testedValues: testedValues,
     );
-    return SudokuCellReplaced.replaceCellAt(
-        state: state, index: index, cell: newCell);
+    return SudokuCellReplaced.replaceCellAt(state: state, index: index, cell: newCell);
   }
 
   factory SudokuCellReplaced.replaceCellAt({
@@ -59,8 +53,7 @@ class SudokuCellReplaced extends SudokuState {
     newSudokuCells.replaceRange(index, index + 1, [cell]);
     final newSudoku = SudokuModel(cells: newSudokuCells);
     return SudokuCellReplaced(
-      state:
-          SudokuInitial(sudokuModel: newSudoku, sudokuImage: state.sudokuImage),
+      state: SudokuInitial(sudokuModel: newSudoku, sudokuImage: state.sudokuImage),
       changedCell: cell,
     );
   }
@@ -69,11 +62,12 @@ class SudokuCellReplaced extends SudokuState {
 }
 
 class SudokuImageSelectionStarted extends SudokuState {
-  SudokuImageSelectionStarted(
-      {required this.imagePathProvider, required SudokuState state})
-      : super.fromState(state: state);
+  SudokuImageSelectionStarted({
+    // required this.imagePathProvider,
+    required super.state,
+  }) : super.fromState();
 
-  final ImagePathProvider imagePathProvider;
+  // final ImagePathProvider imagePathProvider;
 }
 
 class SudokuImageSelectionInProgress extends SudokuState {
@@ -81,38 +75,31 @@ class SudokuImageSelectionInProgress extends SudokuState {
 }
 
 class SudokuImageSelectionSucceed extends SudokuState {
-  SudokuImageSelectionSucceed({required SudokuState state})
-      : super.fromState(state: state);
+  SudokuImageSelectionSucceed({required super.state}) : super.fromState();
 }
 
 class SudokuCellsWithImages extends SudokuState {
-  SudokuCellsWithImages({required SudokuState state})
-      : super.fromState(state: state);
+  SudokuCellsWithImages({required super.state}) : super.fromState();
 }
 
 class SudokuCellValuesRecognitionInProgress extends SudokuState {
-  SudokuCellValuesRecognitionInProgress({required SudokuState state})
-      : super.fromState(state: state);
+  SudokuCellValuesRecognitionInProgress({required super.state}) : super.fromState();
 }
 
 class SudokuCellValuesRecognitionFinished extends SudokuState {
-  SudokuCellValuesRecognitionFinished(
-      {required SudokuState state, required this.cellImages})
-      : super.fromState(state: state);
+  SudokuCellValuesRecognitionFinished({required super.state, required this.cellImages}) : super.fromState();
 
   List<Uint8List> cellImages;
 }
 
 class SudokuCellRepositioning extends SudokuState {
-  SudokuCellRepositioning({required this.previousState})
-      : super.fromState(state: previousState);
+  SudokuCellRepositioning({required this.previousState}) : super.fromState(state: previousState);
 
   final SudokuState previousState;
 }
 
 class SudokuSolvingInProgress extends SudokuState {
-  SudokuSolvingInProgress({required this.previousState})
-      : super.fromState(state: previousState);
+  SudokuSolvingInProgress({required this.previousState}) : super.fromState(state: previousState);
 
   final SudokuState previousState;
 }

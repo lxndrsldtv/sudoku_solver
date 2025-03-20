@@ -4,10 +4,10 @@ import 'dart:math';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_texts.dart';
 import 'package:image/image.dart' as image_tools;
 import 'package:logging/logging.dart';
 import 'package:sudoku_solver/blocs/sudoku_events.dart';
+import 'package:sudoku_solver/l10n/app_texts.dart';
 
 import '../blocs/sudoku_bloc.dart';
 
@@ -81,8 +81,7 @@ class CameraWidgetState extends State<CameraWidget> {
 
     final screenOrientation = MediaQuery.of(context).orientation;
 
-    overlayFrameSideLength =
-        min(screenSize.width, screenSize.height) - 100 + 2 * overlayFrameWidth;
+    overlayFrameSideLength = min(screenSize.width, screenSize.height) - 100 + 2 * overlayFrameWidth;
 
     return Scaffold(
       body: FutureBuilder<void>(
@@ -141,10 +140,8 @@ class CameraWidgetState extends State<CameraWidget> {
                     color: Colors.black54,
                     child: Center(
                       child: Text(
-                        AppLocalizations.of(context)?.txtProcessingImage ??
-                            'Processing image...',
-                        style:
-                            const TextStyle(color: Colors.white, fontSize: 24),
+                        AppLocalizations.of(context)?.txtProcessingImage ?? 'Processing image...',
+                        style: const TextStyle(color: Colors.white, fontSize: 24),
                       ),
                     ),
                   ),
@@ -202,15 +199,12 @@ class CameraWidgetState extends State<CameraWidget> {
     logger.info('imageWidth = ${image.width}');
     logger.info('imageHeight = ${image.height}');
 
-    final cameraPreviewRenderBox =
-        previewKey.currentContext?.findRenderObject() as RenderBox;
+    final cameraPreviewRenderBox = previewKey.currentContext?.findRenderObject() as RenderBox;
 
-    final imageToPreviewScaleRatio =
-        image.height / cameraPreviewRenderBox.size.height;
+    final imageToPreviewScaleRatio = image.height / cameraPreviewRenderBox.size.height;
     logger.info('imageToPreviewScaleRatio = $imageToPreviewScaleRatio');
 
-    final scaledOverlayFrameSideLength =
-        overlayFrameSideLength * imageToPreviewScaleRatio;
+    final scaledOverlayFrameSideLength = overlayFrameSideLength * imageToPreviewScaleRatio;
     logger.info('overlayFrameSideLength = $overlayFrameSideLength');
     logger.info('scaledOverlayFrameSideLength = $scaledOverlayFrameSideLength');
 
@@ -220,12 +214,10 @@ class CameraWidgetState extends State<CameraWidget> {
     final imageCenterByY = image.height / 2;
     logger.info('imageCenterByY = $imageCenterByY');
 
-    final overlayTopLeftXCoordinate =
-        imageCenterByX - scaledOverlayFrameSideLength / 2;
+    final overlayTopLeftXCoordinate = imageCenterByX - scaledOverlayFrameSideLength / 2;
     logger.info('overlayTopLeftXCoordinate = $overlayTopLeftXCoordinate');
 
-    final overlayTopLeftYCoordinate =
-        imageCenterByY - scaledOverlayFrameSideLength / 2;
+    final overlayTopLeftYCoordinate = imageCenterByY - scaledOverlayFrameSideLength / 2;
     logger.info('overlayTopLeftYCoordinate = $overlayTopLeftYCoordinate');
 
     final croppedImage = image_tools.copyCrop(

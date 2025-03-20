@@ -2,19 +2,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
 import 'package:sudoku_solver/services/image_process_service.dart';
 
+import '../services/sudoku_solver_service.dart';
 import './sudoku_events.dart';
 import './sudoku_states.dart';
-import '../services/image_path_provider.dart';
-import '../services/sudoku_solver_service.dart';
 
 class SudokuBloc extends Bloc<SudokuEvent, SudokuState> {
   final logger = Logger('SudokuBloc');
 
-  final ImagePathProvider _imagePathProvider;
+  // final ImagePathProvider _imagePathProvider;
   bool stopProcessing = false;
 
-  SudokuBloc({required imagePathProvider})
-      : _imagePathProvider = imagePathProvider,
+  // SudokuBloc({required imagePathProvider})
+  SudokuBloc()
+      : //_imagePathProvider = imagePathProvider,
         super(SudokuInitial()) {
     on<SudokuStarted>(_onStarted);
     on<SudokuSelectImagePressed>(_onSelectImagePressed);
@@ -35,18 +35,16 @@ class SudokuBloc extends Bloc<SudokuEvent, SudokuState> {
     logger.info('Emitted state: $state');
   }
 
-  void _onSelectImagePressed(
-      SudokuSelectImagePressed event, Emitter<SudokuState> emit) async {
+  void _onSelectImagePressed(SudokuSelectImagePressed event, Emitter<SudokuState> emit) async {
     logger.info('Received event: $event');
 
-    emit(SudokuImageSelectionStarted(
-        imagePathProvider: _imagePathProvider, state: state));
+    // emit(SudokuImageSelectionStarted(imagePathProvider: _imagePathProvider, state: state));
+    emit(SudokuImageSelectionStarted(state: state));
 
     logger.info('Emitted state: $state');
   }
 
-  void _onSudokuImagePickerStarted(
-      SudokuImagePickerStarted event, Emitter<SudokuState> emit) async {
+  void _onSudokuImagePickerStarted(SudokuImagePickerStarted event, Emitter<SudokuState> emit) async {
     logger.info('Received event: $event');
     logger.info('Current state: $state');
 
@@ -55,17 +53,14 @@ class SudokuBloc extends Bloc<SudokuEvent, SudokuState> {
     logger.info('Emitted state: $state');
   }
 
-  void _onReplaceCellValueRequested(
-      SudokuReplaceCellValueRequested event, Emitter<SudokuState> emit) {
+  void _onReplaceCellValueRequested(SudokuReplaceCellValueRequested event, Emitter<SudokuState> emit) {
     logger.info('Received event: $event');
 
-    emit(SudokuCellReplaced.replaceCellAtIndexWith(
-        state: state, index: event.index, value: event.value));
+    emit(SudokuCellReplaced.replaceCellAtIndexWith(state: state, index: event.index, value: event.value));
     logger.info('Emitted state: $state');
   }
 
-  void _onSudokuImageRenderingDone(
-      SudokuImageRenderingDone event, Emitter<SudokuState> emit) async {
+  void _onSudokuImageRenderingDone(SudokuImageRenderingDone event, Emitter<SudokuState> emit) async {
     logger.info('Received event: $event');
     logger.info('Current state: $state');
 
@@ -81,23 +76,20 @@ class SudokuBloc extends Bloc<SudokuEvent, SudokuState> {
   }
 
   ///---------------------------------------------------------------------------
-  void _onSudokuCellsRepositioningDone(
-      SudokuCellsRepositioningDone event, Emitter<SudokuState> emit) async {
+  void _onSudokuCellsRepositioningDone(SudokuCellsRepositioningDone event, Emitter<SudokuState> emit) async {
     logger.info('Received event: $event');
 
     emit(SudokuCellValuesRecognitionInProgress(state: state));
     stopProcessing = false;
 
     if (state is! SudokuCellValuesRecognitionInProgress) {
-      logger.shout(
-          'Error! Current state is not SudokuCellValuesRecognitionInProgress');
+      logger.shout('Error! Current state is not SudokuCellValuesRecognitionInProgress');
       return;
     }
 
     var index = 0;
     final sudokuCellImages = state.sudokuImage!.sudokuCellImages;
-    await for (final cellValue
-        in ImageProcessService.convert(sudokuCellImages)) {
+    await for (final cellValue in ImageProcessService.convert(sudokuCellImages)) {
       if (state is SudokuInitial && stopProcessing) return;
       emit(SudokuCellReplaced.replaceCellAtIndexWith(
         state: state,
@@ -117,8 +109,7 @@ class SudokuBloc extends Bloc<SudokuEvent, SudokuState> {
   ) async {
     emit(SudokuSolvingInProgress(previousState: state));
 
-    await for (final cell
-        in SudokuSolverService.process(sudoku: state.sudokuModel)) {
+    await for (final cell in SudokuSolverService.process(sudoku: state.sudokuModel)) {
       final restartButtonPressed = state is SudokuInitial && stopProcessing;
       if (restartButtonPressed) return;
       emit(
@@ -132,15 +123,13 @@ class SudokuBloc extends Bloc<SudokuEvent, SudokuState> {
     }
   }
 
-  void _onSudokuImageHidden(
-      SudokuEvent event, Emitter<SudokuState> emit) async {
+  void _onSudokuImageHidden(SudokuEvent event, Emitter<SudokuState> emit) async {
     logger.info('Received event: $event');
     emit(SudokuCellRepositioning(previousState: state));
     logger.info('Emitted state: $state');
   }
 
-  void _onSudokuImageSelected(
-      SudokuImageSelected event, Emitter<SudokuState> emit) async {
+  void _onSudokuImageSelected(SudokuImageSelected event, Emitter<SudokuState> emit) async {
     logger.info('Received event: $event');
 
     state.sudokuImage = await SudokuImage.create(event.image);
@@ -154,21 +143,22 @@ class SudokuBloc extends Bloc<SudokuEvent, SudokuState> {
     logger.info('Emitted state: $state');
   }
 
-  void _onSudokuImageSelectionDone(
-      SudokuImageSelectionDone event, Emitter<SudokuState> emit) async {
+  void _onSudokuImageSelectionDone(SudokuImageSelectionDone event, Emitter<SudokuState> emit) async {
     logger.info('Received event: $event');
 
-    final imageFile = event.imageFile;
-    if (null == imageFile) {
-      emit(SudokuInitial(sudokuModel: state.sudokuModel));
-      return;
-    }
-
-    final image = await ImageProcessService.read(imageFile);
+    // final imageFile = event.imageFile;
+    // if (null == imageFile) {
+    final image = event.image;
     if (null == image) {
       emit(SudokuInitial(sudokuModel: state.sudokuModel));
       return;
     }
+
+    // final image = await ImageProcessService.read(imageFile);
+    // if (null == image) {
+    //   emit(SudokuInitial(sudokuModel: state.sudokuModel));
+    //   return;
+    // }
 
     state.sudokuImage = await SudokuImage.create(image);
     if (null == state.sudokuImage) {

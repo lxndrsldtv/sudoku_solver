@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_texts.dart';
 import 'package:logging/logging.dart';
 import 'package:sudoku_solver/blocs/presentation/presentation_bloc.dart';
+import 'package:sudoku_solver/l10n/app_texts.dart';
 
 import './dialog_frame.dart';
 import '../blocs/presentation/presentation_events.dart';
@@ -13,7 +13,7 @@ import '../blocs/settings/settings_states.dart';
 class SettingsDialog extends StatelessWidget {
   final logger = Logger('SettingsDialog');
 
-  SettingsDialog({Key? key}) : super(key: key);
+  SettingsDialog({super.key});
 
   Widget buildLabel(String text) => Text(
         text,
@@ -28,8 +28,7 @@ class SettingsDialog extends StatelessWidget {
     return BlocBuilder<SettingsBloc, SettingsState>(builder: (context, state) {
       logger.info('BlocBuilder');
       return DialogFrame(
-          titleText:
-              AppLocalizations.of(context)?.dlgSetCellValue_Title ?? 'Settings',
+          titleText: AppLocalizations.of(context)?.dlgSetCellValue_Title ?? 'Settings',
           children: [
             Column(children: [
               Container(
@@ -37,23 +36,19 @@ class SettingsDialog extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   color: Colors.white,
                   child: Row(children: [
-                    buildLabel(AppLocalizations.of(context)
-                            ?.dlgSettings_lblShowImgInCellCorner ??
+                    buildLabel(AppLocalizations.of(context)?.dlgSettings_lblShowImgInCellCorner ??
                         'Show image in cell corner:'),
                     const Spacer(),
                     Checkbox(
                       activeColor: Colors.black,
                       side: const BorderSide(color: Colors.black),
-                      value: settingsBloc
-                          .state.settings.cellSettings.displayCellImage,
-                      onChanged: (value) =>
-                          settingsBloc.add(ShowImageInCellFlagValueToggled()),
+                      value: settingsBloc.state.settings.cellSettings.displayCellImage,
+                      onChanged: (value) => settingsBloc.add(ShowImageInCellFlagValueToggled()),
                     ),
                   ]))
             ])
           ],
-          onClose: () =>
-              presentationBloc.add(SettingsDialogCloseButtonPressed()));
+          onClose: () => presentationBloc.add(SettingsDialogCloseButtonPressed()));
     });
   }
 }

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_texts.dart';
+import 'package:sudoku_solver/l10n/app_texts.dart';
 
-import './camera_widget.dart';
 import '../blocs/presentation/presentation_bloc.dart';
 import '../blocs/presentation/presentation_events.dart';
 import '../blocs/sudoku_bloc.dart';
 import '../blocs/sudoku_events.dart';
+import './camera_widget.dart';
 
 class ControlButtonBar extends StatelessWidget {
   const ControlButtonBar({
@@ -15,8 +15,7 @@ class ControlButtonBar extends StatelessWidget {
 
   final textStyle = const TextStyle(color: Colors.black);
 
-  Widget buildIconButton(Key? key, Widget icon, double? iconSize,
-          String tooltip, void Function() onPressed) =>
+  Widget buildIconButton(Key? key, Widget icon, double? iconSize, String tooltip, void Function() onPressed) =>
       Flexible(
         child: IconButton(
           key: key,
@@ -30,8 +29,7 @@ class ControlButtonBar extends StatelessWidget {
         ),
       );
 
-  List<Widget> buttons(BuildContext context, SudokuBloc sudokuBloc,
-      PresentationBloc presentationBloc) {
+  List<Widget> buttons(BuildContext context, SudokuBloc sudokuBloc, PresentationBloc presentationBloc) {
     final mediaQuery = MediaQuery.of(context);
     final screenSize = mediaQuery.size;
     final screenOrientation = mediaQuery.orientation;
@@ -48,8 +46,7 @@ class ControlButtonBar extends StatelessWidget {
         'key': const Key('camera_btn'),
         'icon': const Icon(Icons.camera),
         'tooltip': appLocalizations?.btnLabelCamera ?? 'Take picture',
-        'handler': () => Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => const CameraWidget())),
+        'handler': () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => const CameraWidget())),
       },
       {
         'key': const Key('solve_btn'),
@@ -82,14 +79,10 @@ class ControlButtonBar extends StatelessWidget {
     }
 
     // map button "descriptions" to widgets
-    return buttonDescriptions.map((e) =>
-      buildIconButton(
-          e['key'] as Key,
-          e['icon']as Icon,
-          iconSize,
-          e['tooltip'] as String,
-          e['handler'] as void Function())
-    ).toList();
+    return buttonDescriptions
+        .map((e) => buildIconButton(
+            e['key'] as Key, e['icon'] as Icon, iconSize, e['tooltip'] as String, e['handler'] as void Function()))
+        .toList();
   }
 
   @override
@@ -101,10 +94,8 @@ class ControlButtonBar extends StatelessWidget {
 
     return screenOrientation == Orientation.portrait
         ? Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: buttons(context, sudokuBloc, presentationBloc))
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: buttons(context, sudokuBloc, presentationBloc))
         : Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: buttons(context, sudokuBloc, presentationBloc));
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: buttons(context, sudokuBloc, presentationBloc));
   }
 }

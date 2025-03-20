@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:cross_file/cross_file.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
@@ -12,8 +13,7 @@ class SudokuImage {
   static final logger = Logger('SudokuImage');
   final Image image;
   final Uint8List encodedBmpImage;
-  final List<SudokuCellImage> _sudokuCellImages =
-      List<SudokuCellImage>.empty(growable: true);
+  final List<SudokuCellImage> _sudokuCellImages = List<SudokuCellImage>.empty(growable: true);
 
   SudokuImage._internal(this.image, this.encodedBmpImage);
 
@@ -23,8 +23,7 @@ class SudokuImage {
     final sudokuImage = SudokuImage._internal(image, encodeBmp(image));
 
     try {
-      await for (final cellImage
-          in ImageProcessService.decompose(sudokuImage: sudokuImage)) {
+      await for (final cellImage in ImageProcessService.decompose(sudokuImage: sudokuImage)) {
         sudokuImage._sudokuCellImages.add(cellImage);
       }
     } catch (e) {
@@ -51,7 +50,15 @@ class ImageProcessService {
   ///
   ///
   static Future<Image?> read(XFile imageFile) async {
-    return await decodeImageFile(imageFile.path);
+    logger.info('Reading image file: $imageFile');
+    try {
+      final image = await decodeImageFile(imageFile.path);
+      logger.info('Image size: ${image?.width} x ${image?.height}');
+      return image;
+    } catch (e) {
+      logger.shout('Error: $e');
+      return null;
+    }
   }
 
   ///
@@ -61,14 +68,9 @@ class ImageProcessService {
   /// The [margin] defines the indents from calculated cell borders to exclude
   /// unnecessary parts of picture, like, for example, the lines between cells
   static Stream<SudokuCellImage> decompose(
-      {required SudokuImage sudokuImage,
-      int columns = 9,
-      int rows = 9,
-      int margin = 5}) async* {
-    final movingWorkAreaWidth =
-        (sudokuImage.image.width / columns).round();
-    final movingWorkAreaHeight =
-        (sudokuImage.image.height / rows).round();
+      {required SudokuImage sudokuImage, int columns = 9, int rows = 9, int margin = 5}) async* {
+    final movingWorkAreaWidth = (sudokuImage.image.width / columns).round();
+    final movingWorkAreaHeight = (sudokuImage.image.height / rows).round();
 
     final doubleMargin = margin * 2;
     final cellImageHeight = movingWorkAreaHeight - doubleMargin;
@@ -81,8 +83,7 @@ class ImageProcessService {
             y: movingWorkAreaHeight * i + margin,
             width: cellImageWidth,
             height: cellImageHeight);
-        yield SudokuCellImage(
-            image: _adjust(image: cellImage), encodedBmpImage: encodeBmp(cellImage));
+        yield SudokuCellImage(image: _adjust(image: cellImage), encodedBmpImage: encodeBmp(cellImage));
       }
     }
   }
@@ -98,17 +99,18 @@ class ImageProcessService {
 
   static Future<int> _recognize({required SudokuCellImage cellImage}) async {
     // final imageFile = await _create(image: _adjust(image: cellImage.image));
-    final imageFile = await _create(image: cellImage.image);
-    if (imageFile == null) return 0;
-    final cellValue = await _process(imageFile: imageFile);
-    await _delete(file: imageFile);
+    // final imageFile = await _create(image: cellImage.image);
+    // if (imageFile == null) return 0;
+    // final cellValue = await _process(imageFile: imageFile);
+    // await _delete(file: imageFile);
+
+    final cellValue = await _processBytes(image: cellImage.image);
     return cellValue;
   }
 
   static Future<XFile?> _create({required Image image}) async {
     const imageFileName = 'tmp.bmp';
-    final imageFilePath =
-        '${(await getApplicationDocumentsDirectory()).path}/$imageFileName';
+    final imageFilePath = '${(await getApplicationDocumentsDirectory()).path}/$imageFileName';
     final successEncoding = await encodeBmpFile(imageFilePath, image);
     if (!successEncoding) {
       return null;
@@ -126,6 +128,20 @@ class ImageProcessService {
 
   static Future<int> _process({required XFile imageFile}) async {
     final inputImage = InputImage.fromFilePath(imageFile.path);
+    final recognizedText = await TextRecognizer().processImage(inputImage);
+    return int.tryParse(recognizedText.text) ?? 0;
+  }
+
+  static Future<int> _processBytes({required Image image}) async {
+    // final inputImage = InputImage.fromFilePath(imageFile.path);
+    final inputImage = InputImage.fromBytes(
+      bytes: image.toUint8List(),
+      metadata: InputImageMetadata(
+          size: Size(image.width.toDouble(), image.height.toDouble()),
+          rotation: InputImageRotation.rotation0deg,
+          format: InputImageFormat.bgra8888,
+          bytesPerRow: 0),
+    );
     final recognizedText = await TextRecognizer().processImage(inputImage);
     return int.tryParse(recognizedText.text) ?? 0;
   }
