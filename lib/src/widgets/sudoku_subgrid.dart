@@ -3,12 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 interface class SudokuSubgridWidgetSettings {
-  // final int gridSize = 9;
-  // final double gridPadding = 1.0;
-  // final double padding = 8.0;
-  // final double cellPadding = 2.0;
-  // final Color backgroundColor = const Color(0xFF616161);
-
   final int subgridSize = 9;
   final double subgridPadding = 0.0;
   final double subgridCellPadding = 1.0;
