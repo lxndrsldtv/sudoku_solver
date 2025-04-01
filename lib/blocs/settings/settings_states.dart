@@ -11,6 +11,5 @@ class SettingsInitial extends SettingsState {
 }
 
 class SettingsValueUpdated extends SettingsState {
-  SettingsValueUpdated({required AppSettingsModel settings})
-      : super(settings: settings);
+  SettingsValueUpdated({required super.settings});
 }

@@ -2,17 +2,17 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 
+import '../models/sudoku_cell_model.dart';
 import './button_pad_widget.dart';
 import './cell_info_widget.dart';
 import './dialog_frame.dart';
-import '../models/sudoku_cell_model.dart';
 
 class SetCellValueDialog extends StatelessWidget {
   const SetCellValueDialog({
-    Key? key,
+    super.key,
     required this.cellModel,
     required this.cellImage,
-  }) : super(key: key);
+  });
 
   final SudokuCellModel cellModel;
   final Uint8List cellImage;

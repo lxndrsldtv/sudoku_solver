@@ -11,11 +11,9 @@ class PresentationInitial extends PresentationState {
 }
 
 class SettingsDialogIsOpened extends PresentationState {
-  SettingsDialogIsOpened({required AppPresentationModel presentationModel})
-      : super(presentationModel: presentationModel);
+  SettingsDialogIsOpened({required super.presentationModel});
 }
 
 class SettingsDialogIsClosed extends PresentationState {
-  SettingsDialogIsClosed({required AppPresentationModel presentationModel})
-      : super(presentationModel: presentationModel);
+  SettingsDialogIsClosed({required super.presentationModel});
 }

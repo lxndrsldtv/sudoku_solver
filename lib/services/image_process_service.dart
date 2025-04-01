@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:io';
+// import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
 
@@ -7,7 +7,7 @@ import 'package:cross_file/cross_file.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image/image.dart';
 import 'package:logging/logging.dart';
-import 'package:path_provider/path_provider.dart';
+// import 'package:path_provider/path_provider.dart';
 
 class SudokuImage {
   static final logger = Logger('SudokuImage');
@@ -108,29 +108,29 @@ class ImageProcessService {
     return cellValue;
   }
 
-  static Future<XFile?> _create({required Image image}) async {
-    const imageFileName = 'tmp.bmp';
-    final imageFilePath = '${(await getApplicationDocumentsDirectory()).path}/$imageFileName';
-    final successEncoding = await encodeBmpFile(imageFilePath, image);
-    if (!successEncoding) {
-      return null;
-    }
-    return XFile(imageFilePath);
-  }
+  // static Future<XFile?> _create({required Image image}) async {
+  //   const imageFileName = 'tmp.bmp';
+  //   final imageFilePath = '${(await getApplicationDocumentsDirectory()).path}/$imageFileName';
+  //   final successEncoding = await encodeBmpFile(imageFilePath, image);
+  //   if (!successEncoding) {
+  //     return null;
+  //   }
+  //   return XFile(imageFilePath);
+  // }
 
-  static Future<void> _delete({required XFile file}) async {
-    try {
-      await File(file.path).delete();
-    } catch (e) {
-      logger.shout('Error deleting file. $file', e);
-    }
-  }
+  // static Future<void> _delete({required XFile file}) async {
+  //   try {
+  //     await File(file.path).delete();
+  //   } catch (e) {
+  //     logger.shout('Error deleting file. $file', e);
+  //   }
+  // }
 
-  static Future<int> _process({required XFile imageFile}) async {
-    final inputImage = InputImage.fromFilePath(imageFile.path);
-    final recognizedText = await TextRecognizer().processImage(inputImage);
-    return int.tryParse(recognizedText.text) ?? 0;
-  }
+  // static Future<int> _process({required XFile imageFile}) async {
+  //   final inputImage = InputImage.fromFilePath(imageFile.path);
+  //   final recognizedText = await TextRecognizer().processImage(inputImage);
+  //   return int.tryParse(recognizedText.text) ?? 0;
+  // }
 
   static Future<int> _processBytes({required Image image}) async {
     // final inputImage = InputImage.fromFilePath(imageFile.path);

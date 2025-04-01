@@ -14,8 +14,7 @@ class SudokuModel {
   });
 
   SudokuModel.empty({this.size = const SudokuSize()})
-      : cells = (List<int>.generate(size.cells, (index) => 0))
-            .mapToSudokuCellModelList();
+      : cells = (List<int>.generate(size.cells, (index) => 0)).mapToSudokuCellModelList();
 
   SudokuModel copyWith({
     SudokuSize? size,
@@ -41,20 +40,11 @@ class SudokuModel {
   }
 
   bool _isCellValueUniqueForRowAndColumn(SudokuCellModel cell) {
-    return cells
-            .where((it) =>
-                it.row == cell.row &&
-                it.column == cell.column &&
-                it.value == cell.value)
-            .length ==
-        1;
+    return cells.where((it) => it.row == cell.row && it.column == cell.column && it.value == cell.value).length == 1;
   }
 
   bool _isCellValueUniqueForSubGrid(SudokuCellModel cell) {
-    return cells
-            .where((it) => it.subgrid == cell.subgrid && it.value == cell.value)
-            .length ==
-        1;
+    return cells.where((it) => it.subgrid == cell.subgrid && it.value == cell.value).length == 1;
   }
 }
 
@@ -80,23 +70,20 @@ extension SudokuCellModelExt on List<int> {
     //supposed, that values go in direct order, from R1C1, R1C2, ... to R9C9, etc.
     getRowByIndex(int index, int sudokuSize) => 'R${index ~/ sudokuSize + 1}';
 
-    getColumnByIndex(int index, int sudokuSize) =>
-        'C${(index - (index ~/ sudokuSize) * sudokuSize) + 1}';
+    getColumnByIndex(int index, int sudokuSize) => 'C${(index - (index ~/ sudokuSize) * sudokuSize) + 1}';
 
     String getSubGridRowByIndex(int index, int subGridSize, int sudokuSize) {
       final row = (index ~/ sudokuSize) ~/ subGridSize;
-      final column =
-          (index - (index ~/ sudokuSize) * sudokuSize) ~/ subGridSize;
+      final column = (index - (index ~/ sudokuSize) * sudokuSize) ~/ subGridSize;
       return 'S${row + 1}${column + 1}';
     }
 
     return mapIndexed((index, element) => SudokuCellModel(
-          index: index,
-          row: getRowByIndex(index, sudokuSize.truncate()),
-          column: getColumnByIndex(index, sudokuSize.truncate()),
-          subgrid: getSubGridRowByIndex(
-              index, subGridSize.truncate(), sudokuSize.truncate()),
-          value: element,
-        )).toList();
+        index: index,
+        row: getRowByIndex(index, sudokuSize.truncate()),
+        column: getColumnByIndex(index, sudokuSize.truncate()),
+        subgrid: getSubGridRowByIndex(index, subGridSize.truncate(), sudokuSize.truncate()),
+        value: element,
+        originValue: element)).toList();
   }
 }

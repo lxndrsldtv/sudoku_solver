@@ -16,12 +16,17 @@ void main() async {
   group(
     'CellInfoWidget ',
     (() {
-      testWidgets('Test displaying cell with no value and no image',
-          (tester) async {
+      testWidgets('Test displaying cell with no value and no image', (tester) async {
         await tester.pumpWidget(MaterialApp(
             home: CellInfoWidget(
           cell: SudokuCellModel(
-              index: 0, row: 'R1', column: 'C1', subgrid: 'S01', value: 0),
+            index: 0,
+            row: 'R1',
+            column: 'C1',
+            subgrid: 'S01',
+            value: 0,
+            originValue: 0,
+          ),
           cellImage: Uint8List(0),
         )));
 
@@ -32,12 +37,17 @@ void main() async {
         expect(find.byKey(const Key('EmptyImage')), findsOneWidget);
       });
 
-      testWidgets('Test displaying cell with value and no image',
-          (tester) async {
+      testWidgets('Test displaying cell with value and no image', (tester) async {
         await tester.pumpWidget(MaterialApp(
             home: CellInfoWidget(
           cell: SudokuCellModel(
-              index: 0, row: 'R1', column: 'C1', subgrid: 'S01', value: 1),
+            index: 0,
+            row: 'R1',
+            column: 'C1',
+            subgrid: 'S01',
+            value: 1,
+            originValue: 1,
+          ),
           cellImage: Uint8List(0),
         )));
 
@@ -48,14 +58,18 @@ void main() async {
         expect(find.byKey(const Key('EmptyImage')), findsOneWidget);
       });
 
-      testWidgets('Test displaying cell with image and no value',
-          (tester) async {
+      testWidgets('Test displaying cell with image and no value', (tester) async {
         await tester.pumpWidget(MaterialApp(
             home: CellInfoWidget(
           cell: SudokuCellModel(
-              index: 0, row: 'R1', column: 'C1', subgrid: 'S01', value: 0),
-          cellImage:
-              image_tools.encodeBmp(cellImage ?? image_tools.Image.empty()),
+            index: 0,
+            row: 'R1',
+            column: 'C1',
+            subgrid: 'S01',
+            value: 0,
+            originValue: 0,
+          ),
+          cellImage: image_tools.encodeBmp(cellImage ?? image_tools.Image.empty()),
         )));
 
         expect(find.byKey(const Key('Cell value:')), findsOneWidget);
@@ -69,9 +83,14 @@ void main() async {
         await tester.pumpWidget(MaterialApp(
             home: CellInfoWidget(
           cell: SudokuCellModel(
-              index: 0, row: 'R1', column: 'C1', subgrid: 'S01', value: 7),
-          cellImage:
-              image_tools.encodeBmp(cellImage ?? image_tools.Image.empty()),
+            index: 0,
+            row: 'R1',
+            column: 'C1',
+            subgrid: 'S01',
+            value: 7,
+            originValue: 7,
+          ),
+          cellImage: image_tools.encodeBmp(cellImage ?? image_tools.Image.empty()),
         )));
 
         expect(find.byKey(const Key('Cell value:')), findsOneWidget);

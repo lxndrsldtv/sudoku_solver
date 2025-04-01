@@ -19,7 +19,14 @@ class CellEditButtonBarWidgetDemo extends StatelessWidget {
       supportedLocales: AppLocalizations.supportedLocales,
       // locale: Locale('ru'),
       home: SetCellValueDialog(
-        cellModel: SudokuCellModel(index: 0, row: 'R1', column: 'C1', subgrid: 'S01', value: 1),
+        cellModel: SudokuCellModel(
+          index: 0,
+          row: 'R1',
+          column: 'C1',
+          subgrid: 'S01',
+          value: 1,
+          originValue: 1,
+        ),
         cellImage: Uint8List(0),
       ),
       // ),

@@ -11,8 +11,7 @@ void main() {
     final sudoku = SudokuModel(cells: sudokuHard_1.mapToSudokuCellModelList());
 
     final cell = sudoku.cells[3];
-    final possibleValues = SudokuSolverService.getPossibleValuesForCell(
-        sudoku: sudoku, cell: cell);
+    final possibleValues = SudokuSolverService.getPossibleValuesForCell(sudoku: sudoku, cell: cell);
     expect(possibleValues, {1, 4, 6, 7, 8, 9});
   });
 
@@ -21,12 +20,17 @@ void main() {
       'which are potential values for the cell', () async {
     final sudoku = SudokuModel(cells: sudokuHard_1.mapToSudokuCellModelList());
 
-    final sudokuWithEmptyCellsFilledWithPossibleValues =
-        SudokuSolverService.fillCellsWithPossibleValues(sudoku);
+    final sudokuWithEmptyCellsFilledWithPossibleValues = SudokuSolverService.fillCellsWithPossibleValues(sudoku);
 
-    for (var cell in sudokuWithEmptyCellsFilledWithPossibleValues.cells) {
-      print('${cell.row}:${cell.column} ${cell.value} ${cell.possibleValues}');
-    }
+    expect(
+        sudokuWithEmptyCellsFilledWithPossibleValues.cells
+            .where((cell) => cell.originValue == 0)
+            .every((cell) => cell.possibleValues.isNotEmpty),
+        true);
+
+    // for (var cell in sudokuWithEmptyCellsFilledWithPossibleValues.cells) {
+    //   print('${cell.row}:${cell.column} ${cell.value} ${cell.possibleValues}');
+    // }
   });
 
   test('Some Sudoku can have singleton cells', () async {
@@ -40,12 +44,9 @@ void main() {
     //     (index, previousValue, element) =>
     //         '$previousValue ${element.value == 0 ? '.' : element.value} ${(index + 1) % 9 == 0 ? '\n' : ''}'));
 
-    final sudokuWithFilledPossibleValues =
-        SudokuSolverService.fillCellsWithPossibleValues(sudoku);
-    final subGridS11Cells = sudokuWithFilledPossibleValues.cells
-        .where((cell) => cell.subgrid == 'S11');
-    final singletonCells =
-        SudokuSolverService.findSingletonCells(subGridS11Cells.toList());
+    final sudokuWithFilledPossibleValues = SudokuSolverService.fillCellsWithPossibleValues(sudoku);
+    final subGridS11Cells = sudokuWithFilledPossibleValues.cells.where((cell) => cell.subgrid == 'S11');
+    final singletonCells = SudokuSolverService.findSingletonCells(subGridS11Cells.toList());
 
     // singletonCells.toList().forEach((cell) => print(
     //     '${cell.row}:${cell.column}:${cell.value}:${cell.possibleValues}'));
@@ -53,8 +54,7 @@ void main() {
     expect(singletonCells.length, 2);
   });
 
-  test('fillSingletonCells generate stream of cells, which are singletons',
-      () async {
+  test('fillSingletonCells generate stream of cells, which are singletons', () async {
     final sudoku = SudokuModel(cells: sudokuSimple.mapToSudokuCellModelList());
     // print('\n--- sudoku initial -------------------------------------\n');
     // print(sudoku.cells.foldIndexed(
@@ -63,8 +63,7 @@ void main() {
     //     (index, previousValue, element) =>
     //         '$previousValue ${element.value == 0 ? '.' : element.value} ${(index + 1) % 9 == 0 ? '\n' : ''}'));
 
-    await for (final cell
-        in SudokuSolverService.fillSingletonCells(sudoku: sudoku)) {
+    await for (final cell in SudokuSolverService.fillSingletonCells(sudoku: sudoku)) {
       // print('cell.index = ${cell.index}');
       sudoku.cells.replaceRange(cell.index, cell.index + 1, [cell]);
     }

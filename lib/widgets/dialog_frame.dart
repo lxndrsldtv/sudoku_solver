@@ -7,9 +7,7 @@ class DialogFrame extends StatelessWidget {
   final void Function()? onClose;
   final logger = Logger('DialogFrame');
 
-  DialogFrame(
-      {Key? key, required this.titleText, required this.children, this.onClose})
-      : super(key: key);
+  DialogFrame({super.key, required this.titleText, required this.children, this.onClose});
 
   Widget title() {
     return Container(
