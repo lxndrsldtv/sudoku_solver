@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:sudoku_solver/src/app/app_settings.dart';
 import 'package:sudoku_solver/src/widgets/sudoku_cell.dart';
 import 'package:sudoku_solver/src/widgets/sudoku_grid.dart';
+import 'package:sudoku_solver/src/widgets/sudoku_subgrid.dart';
 
 class PageHome extends StatelessWidget {
   const PageHome({super.key});
@@ -13,21 +14,29 @@ class PageHome extends StatelessWidget {
 
     return Scaffold(
       body: Center(
-        child: SudokuGrid(
+        child: SudokuGridWidget(
           padding: settings.padding,
           gridSize: settings.gridSize,
           gridPadding: settings.gridPadding,
           cellPadding: settings.cellPadding,
           backgroundColor: settings.backgroundColor,
-          cell: SudokuGrid(
+          subgridBuilder: (_, index) => SudokuSubgridWidget(
             padding: settings.padding,
             gridSize: settings.subgridSize,
             gridPadding: settings.subgridPadding,
             cellPadding: settings.subgridCellPadding,
             backgroundColor: settings.subgridBackgroundColor,
-            cell: SudokuCell(),
+            index: index,
+            cellBuilder: (_, subgridIndex, subgridCellIndex) => SudokuCellWidget(
+              subgridIndex: subgridIndex,
+              subgridCellIndex: subgridCellIndex,
+            ),
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.grid_on_sharp),
+        onPressed: () {},
       ),
     );
   }

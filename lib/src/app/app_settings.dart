@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sudoku_solver/src/widgets/sudoku_grid.dart';
+import 'package:sudoku_solver/src/widgets/sudoku_subgrid.dart';
 
-class AppSettings implements SudokuGridSettings {
+class AppSettings implements SudokuGridWidgetSettings, SudokuSubgridWidgetSettings {
   // SudokuGridSettings
   @override
   final int gridSize = 9;

@@ -2,33 +2,40 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-interface class SudokuGridWidgetSettings {
-  final int gridSize = 9;
-  final double gridPadding = 1.0;
-  final double padding = 8.0;
-  final double cellPadding = 2.0;
-  final Color backgroundColor = const Color(0xFF616161);
+interface class SudokuSubgridWidgetSettings {
+  // final int gridSize = 9;
+  // final double gridPadding = 1.0;
+  // final double padding = 8.0;
+  // final double cellPadding = 2.0;
+  // final Color backgroundColor = const Color(0xFF616161);
+
+  final int subgridSize = 9;
+  final double subgridPadding = 0.0;
+  final double subgridCellPadding = 1.0;
+  final Color subgridBackgroundColor = Color(0xFF9E9E9E);
 }
 
-typedef SubgridBuilder = Widget Function(BuildContext context, int index);
+typedef CellBuilder = Widget Function(BuildContext context, int subgridIndex, int subgridCellindex);
 
-class SudokuGridWidget extends StatelessWidget {
-  const SudokuGridWidget({
+class SudokuSubgridWidget extends StatelessWidget {
+  const SudokuSubgridWidget({
     super.key,
     required this.padding,
     required this.gridSize,
     required this.gridPadding,
     required this.cellPadding,
     required this.backgroundColor,
-    required this.subgridBuilder,
+    required this.cellBuilder,
+    required this.index,
   });
 
   final int gridSize;
+  final double padding;
   final double gridPadding;
   final double cellPadding;
-  final double padding;
   final Color backgroundColor;
-  final SubgridBuilder subgridBuilder;
+  final CellBuilder cellBuilder;
+  final int index;
 
   @override
   Widget build(BuildContext context) {
@@ -50,8 +57,8 @@ class SudokuGridWidget extends StatelessWidget {
     );
   }
 
-  Widget? _itemBuilder(BuildContext context, int index) {
+  Widget? _itemBuilder(BuildContext context, int i) {
     if (index > gridSize - 1) return null;
-    return subgridBuilder(context, index);
+    return cellBuilder(context, index, i);
   }
 }

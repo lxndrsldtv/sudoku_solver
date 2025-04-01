@@ -5,6 +5,7 @@ class SudokuCellModel {
     required this.column,
     required this.subgrid,
     required this.value,
+    required this.originValue,
     this.possibleValues = const {},
     this.testedValues = const {},
   });
@@ -14,6 +15,7 @@ class SudokuCellModel {
   final String column;
   final String subgrid;
   final int value;
+  final int originValue;
   final Set<int> possibleValues;
   final Set<int> testedValues;
 
@@ -31,6 +33,7 @@ class SudokuCellModel {
         column: column ?? this.column,
         subgrid: subgrid ?? this.subgrid,
         value: value ?? this.value,
+        originValue: originValue, // origin value can't be chaged with copying
         possibleValues: possibleValues ?? this.possibleValues,
         testedValues: testedValues ?? this.testedValues);
   }
