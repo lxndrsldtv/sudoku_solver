@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:sudoku_solver/src/logger/logger.dart';
+import 'package:sudoku_solver/src/models/sudoku_cell_dto.dart';
 
 typedef SudokuCellModelFactoryFunction = ReactiveSudokuCellModel Function({required Map<String, dynamic> params});
 
@@ -22,6 +23,25 @@ class ReactiveSudokuModel {
 
   Stream<CellState> cellStateStream(int subgridIndex, int subgridCellIndex) =>
       cells[subgridIndex][subgridCellIndex].stateStream();
+
+  void loadData(List<SudokuCellDto> cellDtos) {
+    cells.forEach(_forEachCellOfSubgrid(_clearCell));
+
+    cellDtos.forEach(_setCellOriginValue);
+  }
+
+  void _setCellOriginValue(SudokuCellDto cellDto) {
+    cells[cellDto.subgridIndex][cellDto.subgridCellIndex].state.originValue = cellDto.value;
+  }
+
+  void Function(List<ReactiveSudokuCellModel>) _forEachCellOfSubgrid(
+      void Function(
+        ReactiveSudokuCellModel cell,
+      ) action) {
+    return (subgrid) => subgrid.forEach(action);
+  }
+
+  void _clearCell(ReactiveSudokuCellModel cell) => cell.state.clear();
 }
 
 class ReactiveSudokuLoggableModel extends ReactiveSudokuModel {
@@ -38,6 +58,26 @@ class ReactiveSudokuLoggableModel extends ReactiveSudokuModel {
 
     return result;
   }
+
+  @override
+  void _clearCell(ReactiveSudokuCellModel cell) {
+    logger.info(
+        'ReactiveSudokuLoggableModel._clearCell(subgridIndex: ${cell.state.coordinates.subgridIndex}, subgridCellIndex: ${cell.state.coordinates.subgridCellIndex})');
+    super._clearCell(cell);
+  }
+
+  @override
+  void _setCellOriginValue(SudokuCellDto cellDto) {
+    logger.info(
+        'ReactiveSudokuLoggableModel._setCellOriginValue(subgridIndex: ${cellDto.subgridIndex}, subgridCellIndex: ${cellDto.subgridCellIndex}, value: ${cellDto.value})');
+    super._setCellOriginValue(cellDto);
+  }
+
+  @override
+  void loadData(List<SudokuCellDto> cellDtos) {
+    logger.info('ReactiveSudokuLoggableModel.loadData(cellDtos: $cellDtos)');
+    super.loadData(cellDtos);
+  }
 }
 
 class CellCoordinates {
@@ -51,17 +91,43 @@ class CellCoordinates {
 }
 
 class CellState {
-  final int value;
-  final int originValue;
+  ReactiveSudokuCellModel? _cell;
+
+  int _value;
+  int _originValue;
   final CellCoordinates coordinates;
 
-  const CellState({
+  CellState({
     required this.coordinates,
-    this.value = valueOfEmptyCell,
-    this.originValue = originValueOfEmptyCell,
-  });
+    int value = valueOfEmptyCell,
+    int originValue = originValueOfEmptyCell,
+  })  : _value = value,
+        _originValue = originValue;
 
-  CellState copyWith({required int value}) => CellState(coordinates: coordinates, value: value);
+  set cell(ReactiveSudokuCellModel cell) => _cell = cell;
+
+  set value(int value) {
+    _value = value;
+    _cell?.stateChanged();
+  }
+
+  set originValue(int value) {
+    _originValue = value;
+    _cell?.stateChanged();
+  }
+
+  void reset() {
+    _value = valueOfEmptyCell;
+    _cell?.stateChanged();
+  }
+
+  void clear() {
+    _value = valueOfEmptyCell;
+    _originValue = originValueOfEmptyCell;
+    _cell?.stateChanged();
+  }
+
+  int get value => _originValue == valueOfEmptyCell ? _value : _originValue;
 }
 
 class ReactiveSudokuCellModel {
@@ -73,23 +139,12 @@ class ReactiveSudokuCellModel {
         _controller = StreamController<CellState>();
 
   Stream<CellState> stateStream() {
+    state.cell = this;
     _controller.add(state);
     return _controller.stream;
   }
 
-  set value(int value) {
-    state = state.copyWith(value: value);
-    _controller.add(state);
-  }
-
-  void reset() {
-    state = CellState(
-      coordinates: state.coordinates,
-      value: valueOfEmptyCell,
-      originValue: state.originValue,
-    );
-    _controller.add(state);
-  }
+  void stateChanged() => _controller.add(state);
 }
 
 class ReactiveSudokuCellLoggableModel extends ReactiveSudokuCellModel {
@@ -105,11 +160,5 @@ class ReactiveSudokuCellLoggableModel extends ReactiveSudokuCellModel {
   Stream<CellState> stateStream() {
     logger.info('ReactiveSudokuCellLoggableModel.subscribeToState(): ${state.coordinates.toString()}');
     return super.stateStream();
-  }
-
-  @override
-  set value(int value) {
-    logger.info('ReactiveSudokuCellLoggable.setState($value): ${state.coordinates.toString()}');
-    super.value = value;
   }
 }

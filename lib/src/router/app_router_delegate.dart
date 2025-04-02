@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:sudoku_solver/src/logger/logger.dart';
+import 'package:sudoku_solver/src/models/reactive_sudoku_model.dart';
 import 'package:sudoku_solver/src/pages/page_home.dart';
 import 'package:sudoku_solver/src/router/navigation_state.dart';
 
@@ -22,7 +24,7 @@ class AppRouterDelegate extends RouterDelegate<NavigationState> with ChangeNotif
       onDidRemovePage: (page) => logger.info('Navigator.onDidRemovePage: $page'),
       pages: [
         // TODO:  think to inject pages as dependency
-        if (_navigationState.onHomePage) MaterialPage(child: PageHome()),
+        if (_navigationState.onHomePage) MaterialPage(child: PageHome(sudoku: Injector().get<ReactiveSudokuModel>())),
       ],
     );
   }

@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sudoku_solver/src/app/app_settings.dart';
+import 'package:sudoku_solver/src/models/reactive_sudoku_model.dart';
+import 'package:sudoku_solver/src/pages/sudoku_data.dart';
 import 'package:sudoku_solver/src/widgets/sudoku_cell.dart';
 import 'package:sudoku_solver/src/widgets/sudoku_grid.dart';
 import 'package:sudoku_solver/src/widgets/sudoku_subgrid.dart';
 
 class PageHome extends StatelessWidget {
-  const PageHome({super.key});
+  final ReactiveSudokuModel sudoku;
+
+  const PageHome({super.key, required this.sudoku});
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +40,7 @@ class PageHome extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.grid_on_sharp),
-        onPressed: () {},
+        onPressed: () => sudoku.loadData(cellDTOs),
       ),
     );
   }
