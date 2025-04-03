@@ -35,11 +35,10 @@ class ReactiveSudokuModel {
   }
 
   void Function(List<ReactiveSudokuCellModel>) _forEachCellOfSubgrid(
-      void Function(
-        ReactiveSudokuCellModel cell,
-      ) action) {
-    return (subgrid) => subgrid.forEach(action);
-  }
+          void Function(
+            ReactiveSudokuCellModel cell,
+          ) action) =>
+      (subgrid) => subgrid.forEach(action);
 
   void _clearCell(ReactiveSudokuCellModel cell) => cell.state.clear();
 }
@@ -95,6 +94,8 @@ class CellState {
 
   int _value;
   int _originValue;
+  Set<int> _possibleValues = {};
+  Set<int> _testedValues = {};
   final CellCoordinates coordinates;
 
   CellState({
@@ -115,6 +116,20 @@ class CellState {
     _originValue = value;
     _cell?.stateChanged();
   }
+
+  set possibleValues(Set<int> possibleValues) {
+    _possibleValues = possibleValues;
+    _cell?.stateChanged();
+  }
+
+  Set<int> get possibleValues => _possibleValues;
+
+  set testedValues(Set<int> testedValues) {
+    _testedValues = testedValues;
+    _cell?.stateChanged();
+  }
+
+  Set<int> get testedValues => _testedValues;
 
   void reset() {
     _value = valueOfEmptyCell;

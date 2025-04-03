@@ -6,6 +6,7 @@ import 'package:sudoku_solver/src/models/reactive_sudoku_model.dart';
 import 'package:sudoku_solver/src/router/app_route_information_parser.dart';
 import 'package:sudoku_solver/src/router/app_router_delegate.dart';
 import 'package:sudoku_solver/src/router/navigation_state.dart';
+import 'package:sudoku_solver/src/services/solver_service.dart';
 
 class Module {
   Injector initialize(Injector injector) {
@@ -45,6 +46,11 @@ class Module {
             subgridCellIndex: params['subgridCellIndex'] as int,
             logger: i.get<Logger>(),
           ),
+    );
+
+    injector.map<SolverService>(
+      (i) => SolverService(),
+      isSingleton: true,
     );
 
     return injector;

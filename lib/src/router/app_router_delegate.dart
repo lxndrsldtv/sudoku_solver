@@ -4,6 +4,7 @@ import 'package:sudoku_solver/src/logger/logger.dart';
 import 'package:sudoku_solver/src/models/reactive_sudoku_model.dart';
 import 'package:sudoku_solver/src/pages/page_home.dart';
 import 'package:sudoku_solver/src/router/navigation_state.dart';
+import 'package:sudoku_solver/src/services/solver_service.dart';
 
 class AppRouterDelegate extends RouterDelegate<NavigationState> with ChangeNotifier, PopNavigatorRouterDelegateMixin {
   final Logger logger;
@@ -24,7 +25,12 @@ class AppRouterDelegate extends RouterDelegate<NavigationState> with ChangeNotif
       onDidRemovePage: (page) => logger.info('Navigator.onDidRemovePage: $page'),
       pages: [
         // TODO:  think to inject pages as dependency
-        if (_navigationState.onHomePage) MaterialPage(child: PageHome(sudoku: Injector().get<ReactiveSudokuModel>())),
+        if (_navigationState.onHomePage)
+          MaterialPage(
+              child: PageHome(
+            sudoku: Injector().get<ReactiveSudokuModel>(),
+            solver: Injector().get<SolverService>(),
+          )),
       ],
     );
   }
