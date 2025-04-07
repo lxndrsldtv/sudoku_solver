@@ -32,10 +32,12 @@ class SudokuGridWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final minSide = min(MediaQuery.of(context).size.width, MediaQuery.of(context).size.height);
+
     return Container(
       color: backgroundColor,
-      height: MediaQuery.of(context).size.width - padding,
-      width: MediaQuery.of(context).size.width - padding,
+      height: minSide - padding,
+      width: minSide - padding,
       child: GridView.builder(
         padding: EdgeInsets.all(gridPadding),
         physics: const NeverScrollableScrollPhysics(),

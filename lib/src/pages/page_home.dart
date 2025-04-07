@@ -56,6 +56,13 @@ class PageHome extends StatelessWidget {
               onPressed: () => solver.calculatePossibleValues(sudoku),
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: FloatingActionButton(
+              child: const Icon(Icons.fast_forward),
+              onPressed: () {},
+            ),
+          ),
         ],
       ),
     );

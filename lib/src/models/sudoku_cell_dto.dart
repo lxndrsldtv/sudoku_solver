@@ -1,9 +1,9 @@
-class SudokuCellDto {
+class SudokuCellDTO {
   final int subgridIndex;
   final int subgridCellIndex;
   final int value;
 
-  const SudokuCellDto({required this.subgridIndex, required this.subgridCellIndex, required this.value});
+  const SudokuCellDTO({required this.subgridIndex, required this.subgridCellIndex, required this.value});
 
   @override
   String toString() {

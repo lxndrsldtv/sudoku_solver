@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:sudoku_solver/src/models/reactive_sudoku_model.dart';
@@ -17,6 +19,8 @@ class SudokuCellWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final minSide = min(MediaQuery.of(context).size.width, MediaQuery.of(context).size.height);
+
     return StreamBuilder<CellState>(
       stream: Injector().get<ReactiveSudokuModel>().cellStateStream(subgridIndex, subgridCellIndex),
       builder: (context, snapshot) => Container(
@@ -26,8 +30,8 @@ class SudokuCellWidget extends StatelessWidget {
             if (doShowCellCoordinates && snapshot.data != null)
               Text(
                 '${snapshot.data?.coordinates.toString()}',
-                style: TextStyle(fontSize: 8.0),
-                textScaler: TextScaler.linear(MediaQuery.of(context).size.width / minScreenWidth),
+                style: TextStyle(fontSize: 8.0, color: Colors.blue[100]),
+                textScaler: TextScaler.linear(minSide / minScreenWidth),
               ),
             Align(
               alignment: Alignment.center,
@@ -37,30 +41,34 @@ class SudokuCellWidget extends StatelessWidget {
                   scale: animation,
                   child: child,
                 ),
-                child: Text(
+                child: TextField(
                   key: ValueKey(snapshot.data?.value),
-                  snapshot.data == null || snapshot.data?.value == 0 ? '' : '${snapshot.data?.value}',
-                  style: TextStyle(fontSize: 24.0),
-                  textScaler: TextScaler.linear(MediaQuery.of(context).size.width / minScreenWidth),
+                  controller: TextEditingController(
+                      text: snapshot.data == null || snapshot.data?.value == 0 ? '' : '${snapshot.data?.value}'),
+                  style: TextStyle(fontSize: 24.0 * (minSide / minScreenWidth)),
+                  decoration: null,
+                  cursorHeight: 24.0 * minSide / minScreenWidth,
+                  textAlign: TextAlign.center,
+                  onSubmitted: (value) => snapshot.data?.value = int.tryParse(value) ?? 0,
                 ),
               ),
-              // },
             ),
             if (snapshot.data?.possibleValues.isNotEmpty ?? false)
               Align(
-                  alignment: Alignment.bottomRight,
-                  child: AnimatedSwitcher(
-                    duration: Duration(milliseconds: 300),
-                    transitionBuilder: (child, animation) => ScaleTransition(
-                      scale: animation,
-                      child: child,
-                    ),
-                    child: SudokuCellTestedOfPossibleValues(
-                      key: ValueKey(snapshot.data?.possibleValues),
-                      cellPossibleValues: snapshot.data?.possibleValues ?? {},
-                      cellTestedValues: snapshot.data?.testedValues ?? {},
-                    ),
-                  )),
+                alignment: Alignment.bottomRight,
+                child: AnimatedSwitcher(
+                  duration: Duration(milliseconds: 300),
+                  transitionBuilder: (child, animation) => ScaleTransition(
+                    scale: animation,
+                    child: child,
+                  ),
+                  child: SudokuCellTestedAndPossibleValuesWidget(
+                    key: ValueKey(snapshot.data?.possibleValues),
+                    cellPossibleValues: snapshot.data?.possibleValues ?? {},
+                    cellTestedValues: snapshot.data?.testedValues ?? {},
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -68,11 +76,11 @@ class SudokuCellWidget extends StatelessWidget {
   }
 }
 
-class SudokuCellTestedOfPossibleValues extends StatelessWidget {
+class SudokuCellTestedAndPossibleValuesWidget extends StatelessWidget {
   final Set<int> cellPossibleValues;
   final Set<int> cellTestedValues;
 
-  const SudokuCellTestedOfPossibleValues({
+  const SudokuCellTestedAndPossibleValuesWidget({
     super.key,
     required this.cellPossibleValues,
     required this.cellTestedValues,
@@ -80,6 +88,8 @@ class SudokuCellTestedOfPossibleValues extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final minSide = min(MediaQuery.of(context).size.width, MediaQuery.of(context).size.height);
+
     return cellPossibleValues.isEmpty
         ? const SizedBox.shrink()
         : Row(
@@ -87,10 +97,10 @@ class SudokuCellTestedOfPossibleValues extends StatelessWidget {
                 .map((value) => Text(
                       '$value',
                       style: TextStyle(
-                        color: cellTestedValues.contains(value) ? Colors.red : Colors.green,
+                        color: cellTestedValues.contains(value) ? Colors.red[100] : Colors.green[100],
                         fontSize: 6.0,
                       ),
-                      textScaler: TextScaler.linear(MediaQuery.of(context).size.width / minScreenWidth),
+                      textScaler: TextScaler.linear(minSide / minScreenWidth),
                     ))
                 .toList(),
           );

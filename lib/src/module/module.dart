@@ -34,22 +34,23 @@ class Module {
 
     injector.map<ReactiveSudokuModel>(
       (i) => ReactiveSudokuLoggableModel(
-        cellFactory: i.get<SudokuCellModelFactoryFunction>(),
+        cellStateFactory: i.get<SudokuCellStateFactoryFunction>(),
         logger: i.get<Logger>(),
       ),
       isSingleton: true,
     );
 
-    injector.mapWithParams<SudokuCellModelFactoryFunction>(
-      (i, params) => ({required Map<String, dynamic> params}) => ReactiveSudokuCellLoggableModel(
-            subgridIndex: params['subgridIndex'] as int,
-            subgridCellIndex: params['subgridCellIndex'] as int,
-            logger: i.get<Logger>(),
+    injector.mapWithParams<SudokuCellStateFactoryFunction>(
+      (i, params) => ({required Map<String, dynamic> params}) => CellState(
+            coordinates: CellCoordinates(
+              subgridIndex: params['subgridIndex'] as int,
+              subgridCellIndex: params['subgridCellIndex'] as int,
+            ),
           ),
     );
 
     injector.map<SolverService>(
-      (i) => SolverService(),
+      (i) => SolverService(logger: i.get<Logger>()),
       isSingleton: true,
     );
 
