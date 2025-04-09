@@ -50,7 +50,7 @@ class Module {
     );
 
     injector.map<SolverService>(
-      (i) => SolverService(logger: i.get<Logger>()),
+      (i) => SolverServiceLoggable(logger: i.get<Logger>()),
       isSingleton: true,
     );
 

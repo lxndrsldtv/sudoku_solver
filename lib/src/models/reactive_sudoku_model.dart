@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:sudoku_solver/src/logger/logger.dart';
 import 'package:sudoku_solver/src/models/sudoku_cell_dto.dart';
 
@@ -9,6 +10,8 @@ const int countOfSudokuSubgrids = 9;
 const int countOfSudokuSibgridCells = 9;
 const int valueOfEmptyCell = 0;
 const int originValueOfEmptyCell = 0;
+
+const cellPossibleValueCompleteSet = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
 class ReactiveSudokuModel {
   final List<List<CellState>> cells;
@@ -56,7 +59,156 @@ class ReactiveSudokuModel {
     _sudokuStateController.add(cell);
   }
 
-  void stateChanged(CellState cell) => _sudokuStateController.add(cell);
+  void stateChanged(CellState cell) async {
+    // recalculate possible values for dependent cells
+    calculatePossibleValuesForGivenCells((await _cellsDependentOnGiven(cell)).toList());
+
+    _sudokuStateController.add(cell);
+  }
+
+  void calculatePossibleValues() async {
+    final sudokuCells = cells.flattenedToList;
+
+    for (var cell in sudokuCells) {
+      if (cell.value != 0) continue;
+
+      cell.possibleValues = await calculateCellPossibleValues(cell);
+    }
+  }
+
+  void calculatePossibleValuesForGivenCells(List<CellState> cells) async {
+    for (var cell in cells) {
+      if (cell.value != 0) continue;
+
+      cell.possibleValues = await calculateCellPossibleValues(cell);
+
+      _sudokuStateController.add(cell);
+    }
+  }
+
+  Future<Set<int>> calculateCellPossibleValues(CellState cell) async {
+    final sudokuCells = cells.flattenedToList;
+
+    final valuesOfCellsInSameRow = await _cellRowValues(cell, sudokuCells);
+
+    final valuesOfCellsInSameColumn = await _cellColumnValues(cell, sudokuCells);
+
+    final valuesOfCellsInSameSubgrid = await _cellSubgridValues(cell, sudokuCells);
+
+    return Future(() => cellPossibleValueCompleteSet
+        .difference(valuesOfCellsInSameRow.toSet())
+        .difference(valuesOfCellsInSameColumn.toSet())
+        .difference(valuesOfCellsInSameSubgrid.toSet()));
+  }
+
+  final _memCellRowValues = <CellState, Iterable<int>>{};
+  Future<Iterable<int>> _cellRowValues(
+    CellState cell,
+    List<CellState> cells,
+  ) async =>
+      _memoizedCellValues(
+        cell: cell,
+        sudoku: cells,
+        memoizedValues: _memCellRowValues,
+        calcValues: (c, s) async => (await _cellRowCells(c, s)).map((c) => c.value),
+      );
+
+  final _memCellColumnValues = <CellState, Iterable<int>>{};
+  Future<Iterable<int>> _cellColumnValues(
+    CellState cell,
+    List<CellState> cells,
+  ) async =>
+      _memoizedCellValues(
+        cell: cell,
+        sudoku: cells,
+        memoizedValues: _memCellColumnValues,
+        calcValues: (c, s) async => (await _cellColumnCells(c, s)).map((c) => c.value),
+      );
+
+  final _memCellSubgridValues = <CellState, Iterable<int>>{};
+  Future<Iterable<int>> _cellSubgridValues(
+    CellState cell,
+    List<CellState> cells,
+  ) async =>
+      _memoizedCellValues(
+        cell: cell,
+        sudoku: cells,
+        memoizedValues: _memCellSubgridValues,
+        calcValues: (c, s) async => (await _cellSubgridCells(c, s)).map((c) => c.value),
+      );
+
+  Future<Iterable<int>> _memoizedCellValues({
+    required CellState cell,
+    required List<CellState> sudoku,
+    required Map<CellState, Iterable<int>> memoizedValues,
+    required Future<Iterable<int>> Function(CellState c, List<CellState> s) calcValues,
+  }) async {
+    Iterable<int>? result = memoizedValues[cell];
+    if (result != null) {
+      return result;
+    }
+
+    result = await calcValues(cell, sudoku);
+
+    memoizedValues[cell] = result;
+
+    return result;
+  }
+
+  // memoize result of _cellRowCells
+  // _cellRowCells calculates all cells of a row, to which the given cell belongs
+  final memCellRowCells = <CellState, Iterable<CellState>>{};
+  Future<Iterable<CellState>> _cellRowCells(CellState cell, List<CellState> cells) async => memCellRowCells.putIfAbsent(
+        cell,
+        () => cells.where(
+          (c) =>
+              rowIndex(subgridIndex: c.coordinates.subgridIndex, subgridCellIndex: c.coordinates.subgridCellIndex) ==
+              rowIndex(
+                  subgridIndex: cell.coordinates.subgridIndex, subgridCellIndex: cell.coordinates.subgridCellIndex),
+        ),
+      );
+
+  // memoize result of _cellColumnCells
+  // _cellColumnCells calculates all cells of a column, to which the given cell belongs
+  final memCellColumnCells = <CellState, Iterable<CellState>>{};
+  Future<Iterable<CellState>> _cellColumnCells(CellState cell, List<CellState> cells) async =>
+      memCellColumnCells.putIfAbsent(
+        cell,
+        () => cells.where(
+          (c) =>
+              columnIndex(subgridIndex: c.coordinates.subgridIndex, subgridCellIndex: c.coordinates.subgridCellIndex) ==
+              columnIndex(
+                  subgridIndex: cell.coordinates.subgridIndex, subgridCellIndex: cell.coordinates.subgridCellIndex),
+        ),
+      );
+
+  // memoize result of _cellSubgridCells
+  // _cellSubgridCells calculates all cells of a subgrid, to which the given cell belongs
+  final memCellSubgridCells = <CellState, Iterable<CellState>>{};
+  Future<Iterable<CellState>> _cellSubgridCells(CellState cell, List<CellState> cells) async =>
+      memCellSubgridCells.putIfAbsent(
+        cell,
+        () => cells.where((c) => c.coordinates.subgridIndex == cell.coordinates.subgridIndex),
+      );
+
+  Future<Iterable<CellState>> _cellsDependentOnGiven(CellState cell) async {
+    final sudokuCells = cells.flattenedToList;
+    final r = await _cellRowCells(cell, sudokuCells);
+    final c = await _cellColumnCells(cell, sudokuCells);
+    final s = await _cellSubgridCells(cell, sudokuCells);
+    return {...r, ...c, ...s};
+  }
+
+  // memoize result of rowIndex calculation
+  final memRowIndex = List.generate(9, (_) => List<int?>.generate(9, (_) => null));
+
+  int rowIndex({required int subgridIndex, required int subgridCellIndex}) =>
+      memRowIndex[subgridIndex][subgridCellIndex] ??= (subgridCellIndex / 3).floor() + (subgridIndex / 3).floor() * 3;
+
+  // memoize result of columnIndex calculation
+  final memColIndex = List.generate(9, (_) => List<int?>.generate(9, (_) => null));
+  int columnIndex({required int subgridIndex, required int subgridCellIndex}) =>
+      memColIndex[subgridIndex][subgridCellIndex] ??= subgridCellIndex % 3 + (subgridIndex % 3) * 3;
 }
 
 class ReactiveSudokuLoggableModel extends ReactiveSudokuModel {
@@ -75,14 +227,14 @@ class ReactiveSudokuLoggableModel extends ReactiveSudokuModel {
   }
 
   @override
-  void _clearCell(CellState cell) {
+  void clearCell(CellState cell) {
     logger.info(
         'ReactiveSudokuLoggableModel._clearCell(subgridIndex: ${cell.coordinates.subgridIndex}, subgridCellIndex: ${cell.coordinates.subgridCellIndex})');
     super._clearCell(cell);
   }
 
   @override
-  void _setCellOriginValue(SudokuCellDTO cellDto) {
+  void setCellOriginValue(SudokuCellDTO cellDto) {
     logger.info(
         'ReactiveSudokuLoggableModel._setCellOriginValue(subgridIndex: ${cellDto.subgridIndex}, subgridCellIndex: ${cellDto.subgridCellIndex}, value: ${cellDto.value})');
     super._setCellOriginValue(cellDto);
@@ -92,6 +244,26 @@ class ReactiveSudokuLoggableModel extends ReactiveSudokuModel {
   void loadData(List<SudokuCellDTO> cellDtos) {
     logger.info('ReactiveSudokuLoggableModel.loadData(cellDtos: $cellDtos)');
     super.loadData(cellDtos);
+  }
+
+  @override
+  void stateChanged(CellState cell) {
+    logger.info(
+        'ReactiveSudokuLoggableModel.stateChanged(subgridIndex: ${cell.coordinates.subgridIndex}, subgridCellIndex: ${cell.coordinates.subgridCellIndex})');
+    super.stateChanged(cell);
+  }
+
+  @override
+  void calculatePossibleValuesForGivenCells(List<CellState> cells) {
+    logger.info('ReactiveSudokuLoggableModel.calculatePossibleValuesForGivenCells(cells: ${cells.length})');
+    super.calculatePossibleValuesForGivenCells(cells);
+  }
+
+  @override
+  Future<Set<int>> calculateCellPossibleValues(CellState cell) async {
+    logger.info(
+        'ReactiveSudokuLoggableModel.calculateCellPossibleValues(subgridIndex: ${cell.coordinates.subgridIndex}, subgridCellIndex: ${cell.coordinates.subgridCellIndex})');
+    return super.calculateCellPossibleValues(cell);
   }
 }
 
@@ -141,14 +313,12 @@ class CellState {
 
   set possibleValues(Set<int> possibleValues) {
     _possibleValues = possibleValues;
-    _sudoku?.stateChanged(this);
   }
 
   Set<int> get possibleValues => _possibleValues;
 
   set testedValues(Set<int> testedValues) {
     _testedValues = testedValues;
-    _sudoku?.stateChanged(this);
   }
 
   Set<int> get testedValues => _testedValues;

@@ -52,15 +52,22 @@ class PageHome extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(left: 8.0),
             child: FloatingActionButton(
-              child: const Icon(Icons.play_arrow),
-              onPressed: () => solver.calculatePossibleValues(sudoku),
+              child: const Icon(Icons.skip_previous),
+              onPressed: () => solver.undoMove(sudoku),
             ),
           ),
           Padding(
             padding: const EdgeInsets.only(left: 8.0),
             child: FloatingActionButton(
-              child: const Icon(Icons.fast_forward),
-              onPressed: () {},
+              child: const Icon(Icons.play_arrow),
+              onPressed: () => solver.solve(sudoku),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: FloatingActionButton(
+              child: const Icon(Icons.skip_next),
+              onPressed: () => solver.doMove(sudoku),
             ),
           ),
         ],
