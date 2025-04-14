@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
+import 'package:sudoku_solver/src/logger/logger.dart';
 import 'package:sudoku_solver/src/models/reactive_sudoku_model.dart';
 
 const bool doShowCellCoordinates = true;
@@ -27,11 +28,30 @@ class SudokuCellWidget extends StatelessWidget {
         color: Color(0xFFFFFFFF),
         child: Stack(
           children: [
+            TweenAnimationBuilder(
+              key: ValueKey(snapshot.data?.value),
+              tween: ColorTween(begin: Colors.red, end: Colors.white),
+              duration: Duration(seconds: 1),
+              builder: (context, color, _) => Padding(
+                padding: const EdgeInsets.all(1.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: color ?? Colors.white,
+                      width: 4.0,
+                    ),
+                  ),
+                ),
+              ),
+            ),
             if (doShowCellCoordinates && snapshot.data != null)
-              Text(
-                '${snapshot.data?.coordinates.toString()}',
-                style: TextStyle(fontSize: 8.0, color: Colors.blue[100]),
-                textScaler: TextScaler.linear(minSide / minScreenWidth),
+              Padding(
+                padding: const EdgeInsets.only(left: 4.0),
+                child: Text(
+                  '${snapshot.data?.coordinates.toString()}',
+                  style: TextStyle(fontSize: 8.0, color: Colors.blue[100]),
+                  textScaler: TextScaler.linear(minSide / minScreenWidth),
+                ),
               ),
             Align(
               alignment: Alignment.center,
@@ -62,10 +82,13 @@ class SudokuCellWidget extends StatelessWidget {
                     scale: animation,
                     child: child,
                   ),
-                  child: SudokuCellTestedAndPossibleValuesWidget(
-                    key: ValueKey(snapshot.data?.possibleValues),
-                    cellPossibleValues: snapshot.data?.possibleValues ?? {},
-                    cellTestedValues: snapshot.data?.testedValues ?? {},
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 4.0),
+                    child: SudokuCellTestedAndPossibleValuesWidget(
+                      key: ValueKey(snapshot.data?.possibleValues),
+                      cellPossibleValues: snapshot.data?.possibleValues ?? {},
+                      cellTestedValues: snapshot.data?.testedValues ?? {},
+                    ),
                   ),
                 ),
               ),
@@ -104,5 +127,22 @@ class SudokuCellTestedAndPossibleValuesWidget extends StatelessWidget {
                     ))
                 .toList(),
           );
+  }
+}
+
+class SudokuCellWidgetLoggable extends SudokuCellWidget {
+  final Logger logger;
+
+  const SudokuCellWidgetLoggable({
+    super.key,
+    required super.subgridIndex,
+    required super.subgridCellIndex,
+    required this.logger,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    logger.info('SudokuCellWidgetLoggable.build(subgridIndex: $subgridIndex, subgridCellIndex: $subgridCellIndex)');
+    return super.build(context);
   }
 }

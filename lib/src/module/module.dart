@@ -7,6 +7,8 @@ import 'package:sudoku_solver/src/router/app_route_information_parser.dart';
 import 'package:sudoku_solver/src/router/app_router_delegate.dart';
 import 'package:sudoku_solver/src/router/navigation_state.dart';
 import 'package:sudoku_solver/src/services/solver_service.dart';
+import 'package:sudoku_solver/src/widgets/sudoku_cell.dart';
+import 'package:sudoku_solver/src/widgets/sudoku_subgrid.dart';
 
 class Module {
   Injector initialize(Injector injector) {
@@ -52,6 +54,14 @@ class Module {
     injector.map<SolverService>(
       (i) => SolverServiceLoggable(logger: i.get<Logger>()),
       isSingleton: true,
+    );
+
+    injector.map<CellBuilder>(
+      (i) => (BuildContext context, int subgridIndex, int subgridCellindex) => SudokuCellWidgetLoggable(
+            subgridIndex: subgridIndex,
+            subgridCellIndex: subgridCellindex,
+            logger: i.get<Logger>(),
+          ),
     );
 
     return injector;

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:provider/provider.dart';
 import 'package:sudoku_solver/src/app/app_settings.dart';
 import 'package:sudoku_solver/src/models/reactive_sudoku_model.dart';
 import 'package:sudoku_solver/src/pages/sudoku_data.dart';
 import 'package:sudoku_solver/src/services/solver_service.dart';
-import 'package:sudoku_solver/src/widgets/sudoku_cell.dart';
 import 'package:sudoku_solver/src/widgets/sudoku_grid.dart';
 import 'package:sudoku_solver/src/widgets/sudoku_subgrid.dart';
 
@@ -34,10 +34,11 @@ class PageHome extends StatelessWidget {
               cellPadding: settings.subgridCellPadding,
               backgroundColor: settings.subgridBackgroundColor,
               index: index,
-              cellBuilder: (_, subgridIndex, subgridCellIndex) => SudokuCellWidget(
-                subgridIndex: subgridIndex,
-                subgridCellIndex: subgridCellIndex,
-              ),
+              // cellBuilder: (_, subgridIndex, subgridCellIndex) => SudokuCellWidget(
+              //   subgridIndex: subgridIndex,
+              //   subgridCellIndex: subgridCellIndex,
+              // ),
+              cellBuilder: Injector().get<CellBuilder>(),
             ),
           ),
         ),

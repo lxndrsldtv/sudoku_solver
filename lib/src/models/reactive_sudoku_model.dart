@@ -8,8 +8,7 @@ typedef SudokuCellStateFactoryFunction = CellState Function({required Map<String
 
 const int countOfSudokuSubgrids = 9;
 const int countOfSudokuSibgridCells = 9;
-const int valueOfEmptyCell = 0;
-const int originValueOfEmptyCell = 0;
+const int emptyValue = 0;
 
 const cellPossibleValueCompleteSet = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
@@ -59,10 +58,22 @@ class ReactiveSudokuModel {
     _sudokuStateController.add(cell);
   }
 
-  void stateChanged(CellState cell) async {
+  Future<void> cellValueChanged(CellState cell) async {
     // recalculate possible values for dependent cells
     calculatePossibleValuesForGivenCells((await _cellsDependentOnGiven(cell)).toList());
 
+    _sudokuStateController.add(cell);
+  }
+
+  void cellPossibleValuesChanged(CellState cell) async {
+    _sudokuStateController.add(cell);
+  }
+
+  void cellTestedValuesChanged(CellState cell) async {
+    _sudokuStateController.add(cell);
+  }
+
+  void cellOriginValueChanged(CellState cell) async {
     _sudokuStateController.add(cell);
   }
 
@@ -247,10 +258,10 @@ class ReactiveSudokuLoggableModel extends ReactiveSudokuModel {
   }
 
   @override
-  void stateChanged(CellState cell) {
+  Future<void> cellValueChanged(CellState cell) async {
     logger.info(
         'ReactiveSudokuLoggableModel.stateChanged(subgridIndex: ${cell.coordinates.subgridIndex}, subgridCellIndex: ${cell.coordinates.subgridCellIndex})');
-    super.stateChanged(cell);
+    super.cellValueChanged(cell);
   }
 
   @override
@@ -288,27 +299,27 @@ class CellState {
 
   CellState({
     required this.coordinates,
-    int value = valueOfEmptyCell,
-    int originValue = originValueOfEmptyCell,
+    int value = emptyValue,
+    int originValue = emptyValue,
   })  : _value = value,
         _originValue = originValue;
 
   set sudoku(ReactiveSudokuModel sudoku) => _sudoku = sudoku;
 
   set value(int value) {
-    final cellHasNoOriginValue = _originValue == originValueOfEmptyCell;
-    final newValueIsOneOfPossibleValues = value == valueOfEmptyCell || _possibleValues.contains(value);
+    final cellHasNoOriginValue = _originValue == emptyValue;
+    final newValueIsOneOfPossibleValues = value == emptyValue || _possibleValues.contains(value);
     if (cellHasNoOriginValue && newValueIsOneOfPossibleValues) {
       _value = value;
     }
-    _sudoku?.stateChanged(this);
+    _sudoku?.cellValueChanged(this);
   }
 
   set originValue(int value) {
-    if (_originValue == originValueOfEmptyCell) {
+    if (_originValue == emptyValue) {
       _originValue = value;
     }
-    _sudoku?.stateChanged(this);
+    _sudoku?.cellValueChanged(this);
   }
 
   set possibleValues(Set<int> possibleValues) {
@@ -324,16 +335,16 @@ class CellState {
   Set<int> get testedValues => _testedValues;
 
   void reset() {
-    _value = valueOfEmptyCell;
+    _value = emptyValue;
     _possibleValues = {};
     _testedValues = {};
-    _sudoku?.stateChanged(this);
+    _sudoku?.cellValueChanged(this);
   }
 
   void clear() {
-    _originValue = originValueOfEmptyCell;
+    _originValue = emptyValue;
     reset();
   }
 
-  int get value => _originValue == valueOfEmptyCell ? _value : _originValue;
+  int get value => _originValue == emptyValue ? _value : _originValue;
 }
