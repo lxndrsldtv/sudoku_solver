@@ -1,14 +1,46 @@
-// import 'package:collection/collection.dart';
+import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:sudoku_solver/src/logger/logger.dart';
 import 'package:sudoku_solver/src/models/reactive_sudoku_model.dart';
 
 class SolverService {
   final moveHistory = <CellState>[];
+  bool _stopSolving = false;
+  bool isSolving = false;
 
-  void solve(ReactiveSudokuModel sudoku) {}
+  Future<void> stop() async => _stopSolving = !_stopSolving;
+  bool get isStopped => _stopSolving;
 
-  CellState? findNextCellToFill(ReactiveSudokuModel sudoku) {
+  Future<void> solve(ReactiveSudokuModel sudoku) async {
+    if (isSolving) return;
+
+    isSolving = true;
+    _stopSolving = false;
+    while (!_stopSolving && _isNotSolved(sudoku)) {
+      CellState? cellToFill = await findNextCellToFill(sudoku);
+      while (cellToFill != null) {
+        await doMove(cellToFill);
+        await Future.delayed(const Duration(milliseconds: 100));
+        cellToFill = await findNextCellToFill(sudoku);
+      }
+      if (_isSolved(sudoku)) {
+        isSolving = false;
+        return;
+      }
+      await changePath(sudoku);
+      await Future.delayed(const Duration(milliseconds: 100));
+    }
+    isSolving = false;
+  }
+
+  bool _isNotSolved(ReactiveSudokuModel sudoku) {
+    return sudoku.cells.flattened.any((c) => c.value == emptyValue);
+  }
+
+  bool _isSolved(ReactiveSudokuModel sudoku) => !_isNotSolved(sudoku);
+
+  Future<CellState?> findNextCellToFill(ReactiveSudokuModel sudoku) async {
     final cells = sudoku.cells.flattened.where((c) => c.value == 0).toList();
     if (cells.isEmpty) {
       return null;
@@ -28,38 +60,35 @@ class SolverService {
     return firstCellWithMinCountPossibleValues;
   }
 
-  void doMove(ReactiveSudokuModel sudoku) {
-    // final cells = sudoku.cells.flattened.where((c) => c.value == 0).toList();
-    // final firstCellWithMinCountPossibleValues = cells.fold<CellState>(
-    //     cells[0],
-    //     (r, c) =>
-    //         r.possibleValues.difference(r.testedValues).length <= c.possibleValues.difference(c.testedValues).length
-    //             ? r
-    //             : c);
-
-    // final untestedValues =
-    //     firstCellWithMinCountPossibleValues.possibleValues.difference(firstCellWithMinCountPossibleValues.testedValues);
-
-    // if (untestedValues.isEmpty) {
-    //   return;
-    // }
-
-    final cellToFill = findNextCellToFill(sudoku);
-
+  Future<void> doMove(CellState? cellToFill) async {
     if (cellToFill == null) {
       return;
     }
 
     final untestedValues = cellToFill.possibleValues.difference(cellToFill.testedValues);
     final valueToTest = untestedValues.toList()[0];
-    cellToFill.value = valueToTest;
+    await cellToFill.setValue(valueToTest);
     cellToFill.testedValues.add(valueToTest);
-    // firstCellWithMinPossibleValues.possibleValues.remove(firstCellWithMinPossibleValues.possibleValues.toList()[0]);
 
     moveHistory.add(cellToFill);
   }
 
-  void undoMove(ReactiveSudokuModel sudoku) {
+  Future<void> changePath(ReactiveSudokuModel sudoku) async {
+    if (moveHistory.isEmpty) {
+      return;
+    }
+
+    CellState latestMove = moveHistory.removeLast();
+    while (latestMove.possibleValues.difference(latestMove.testedValues).isEmpty) {
+      latestMove.testedValues = {};
+      await latestMove.setValue(emptyValue);
+      latestMove = moveHistory.removeLast();
+    }
+
+    await latestMove.setValue(emptyValue);
+  }
+
+  void undoMove(ReactiveSudokuModel sudoku) async {
     if (moveHistory.isEmpty) {
       return;
     }
@@ -67,13 +96,7 @@ class SolverService {
     final lastModifiedCell = moveHistory.removeLast();
 
     lastModifiedCell.testedValues.remove(lastModifiedCell.value);
-    lastModifiedCell.value = emptyValue;
-
-    // // no more variants for this cell
-    // if (lastModifiedCell.possibleValues.difference(lastModifiedCell.testedValues).isEmpty) {
-    //   lastModifiedCell.possibleValues = {};
-    //   lastModifiedCell.testedValues = {};
-    // }
+    await lastModifiedCell.setValue(emptyValue);
   }
 }
 
@@ -83,14 +106,15 @@ class SolverServiceLoggable extends SolverService {
   SolverServiceLoggable({required this.logger});
 
   @override
-  void solve(ReactiveSudokuModel sudoku) {
+  Future<void> solve(ReactiveSudokuModel sudoku) async {
     logger.info('SolverService.solve()');
+    super.solve(sudoku);
   }
 
   @override
-  void doMove(ReactiveSudokuModel sudoku) {
-    logger.info('SolverService.doMove()');
-    super.doMove(sudoku);
+  Future<void> doMove(CellState? cellToFill) async {
+    logger.info('SolverService.doMove(): stopSolving: $_stopSolving');
+    super.doMove(cellToFill);
     logger.info('SolverService move count: ${moveHistory.length}');
   }
 
@@ -99,5 +123,20 @@ class SolverServiceLoggable extends SolverService {
     logger.info('SolverService.undoMove()');
     super.undoMove(sudoku);
     logger.info('SolverService move count: ${moveHistory.length}');
+  }
+
+  @override
+  Future<void> changePath(ReactiveSudokuModel sudoku) async {
+    logger.info('SolverService.changePath()');
+    super.changePath(sudoku);
+    logger.info('SolverService move count: ${moveHistory.length}');
+  }
+
+  @override
+  bool _isNotSolved(ReactiveSudokuModel sudoku) {
+    logger.info('SolverService._isNotSolved()');
+    final result = super._isNotSolved(sudoku);
+    logger.info('SolverService._isNotSolved() result: $result');
+    return result;
   }
 }

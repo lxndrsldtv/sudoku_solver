@@ -34,10 +34,6 @@ class PageHome extends StatelessWidget {
               cellPadding: settings.subgridCellPadding,
               backgroundColor: settings.subgridBackgroundColor,
               index: index,
-              // cellBuilder: (_, subgridIndex, subgridCellIndex) => SudokuCellWidget(
-              //   subgridIndex: subgridIndex,
-              //   subgridCellIndex: subgridCellIndex,
-              // ),
               cellBuilder: Injector().get<CellBuilder>(),
             ),
           ),
@@ -53,6 +49,13 @@ class PageHome extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(left: 8.0),
             child: FloatingActionButton(
+              child: const Icon(Icons.fast_rewind),
+              onPressed: () => solver.changePath(sudoku),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: FloatingActionButton(
               child: const Icon(Icons.skip_previous),
               onPressed: () => solver.undoMove(sudoku),
             ),
@@ -60,15 +63,22 @@ class PageHome extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(left: 8.0),
             child: FloatingActionButton(
-              child: const Icon(Icons.play_arrow),
+              child: const Icon(Icons.stop),
+              onPressed: () => solver.stop(),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: FloatingActionButton(
               onPressed: () => solver.solve(sudoku),
+              child: const Icon(Icons.play_arrow),
             ),
           ),
           Padding(
             padding: const EdgeInsets.only(left: 8.0),
             child: FloatingActionButton(
               child: const Icon(Icons.skip_next),
-              onPressed: () => solver.doMove(sudoku),
+              onPressed: () async => solver.doMove(await solver.findNextCellToFill(sudoku)),
             ),
           ),
         ],

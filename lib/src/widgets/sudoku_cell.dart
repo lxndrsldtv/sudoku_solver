@@ -69,7 +69,7 @@ class SudokuCellWidget extends StatelessWidget {
                   decoration: null,
                   cursorHeight: 24.0 * minSide / minScreenWidth,
                   textAlign: TextAlign.center,
-                  onSubmitted: (value) => snapshot.data?.value = int.tryParse(value) ?? 0,
+                  onSubmitted: (value) => snapshot.data?.setValue(int.tryParse(value) ?? 0),
                 ),
               ),
             ),

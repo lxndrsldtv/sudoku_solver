@@ -60,7 +60,7 @@ class ReactiveSudokuModel {
 
   Future<void> cellValueChanged(CellState cell) async {
     // recalculate possible values for dependent cells
-    calculatePossibleValuesForGivenCells((await _cellsDependentOnGiven(cell)).toList());
+    await calculatePossibleValuesForGivenCells((await _cellsDependentOnGiven(cell)).toList());
 
     _sudokuStateController.add(cell);
   }
@@ -87,7 +87,7 @@ class ReactiveSudokuModel {
     }
   }
 
-  void calculatePossibleValuesForGivenCells(List<CellState> cells) async {
+  Future<void> calculatePossibleValuesForGivenCells(List<CellState> cells) async {
     for (var cell in cells) {
       if (cell.value != 0) continue;
 
@@ -238,20 +238,6 @@ class ReactiveSudokuLoggableModel extends ReactiveSudokuModel {
   }
 
   @override
-  void clearCell(CellState cell) {
-    logger.info(
-        'ReactiveSudokuLoggableModel._clearCell(subgridIndex: ${cell.coordinates.subgridIndex}, subgridCellIndex: ${cell.coordinates.subgridCellIndex})');
-    super._clearCell(cell);
-  }
-
-  @override
-  void setCellOriginValue(SudokuCellDTO cellDto) {
-    logger.info(
-        'ReactiveSudokuLoggableModel._setCellOriginValue(subgridIndex: ${cellDto.subgridIndex}, subgridCellIndex: ${cellDto.subgridCellIndex}, value: ${cellDto.value})');
-    super._setCellOriginValue(cellDto);
-  }
-
-  @override
   void loadData(List<SudokuCellDTO> cellDtos) {
     logger.info('ReactiveSudokuLoggableModel.loadData(cellDtos: $cellDtos)');
     super.loadData(cellDtos);
@@ -260,12 +246,12 @@ class ReactiveSudokuLoggableModel extends ReactiveSudokuModel {
   @override
   Future<void> cellValueChanged(CellState cell) async {
     logger.info(
-        'ReactiveSudokuLoggableModel.stateChanged(subgridIndex: ${cell.coordinates.subgridIndex}, subgridCellIndex: ${cell.coordinates.subgridCellIndex})');
+        'ReactiveSudokuLoggableModel.cellValueChanged(subgridIndex: ${cell.coordinates.subgridIndex}, subgridCellIndex: ${cell.coordinates.subgridCellIndex})');
     super.cellValueChanged(cell);
   }
 
   @override
-  void calculatePossibleValuesForGivenCells(List<CellState> cells) {
+  Future<void> calculatePossibleValuesForGivenCells(List<CellState> cells) async {
     logger.info('ReactiveSudokuLoggableModel.calculatePossibleValuesForGivenCells(cells: ${cells.length})');
     super.calculatePossibleValuesForGivenCells(cells);
   }
@@ -306,13 +292,14 @@ class CellState {
 
   set sudoku(ReactiveSudokuModel sudoku) => _sudoku = sudoku;
 
-  set value(int value) {
+  Future<void> setValue(int value) async {
     final cellHasNoOriginValue = _originValue == emptyValue;
     final newValueIsOneOfPossibleValues = value == emptyValue || _possibleValues.contains(value);
+
     if (cellHasNoOriginValue && newValueIsOneOfPossibleValues) {
       _value = value;
     }
-    _sudoku?.cellValueChanged(this);
+    await _sudoku?.cellValueChanged(this);
   }
 
   set originValue(int value) {
